@@ -32,9 +32,11 @@ const (
 const (
 	//AlphanumericCase alphanumericType is CharsCaseAlphanumeric
 	AlphanumericCase = iota
-	//AlphanumericCase alphanumericType is CharsUpperAlphanumeric
+
+	//AlphanumericUpper alphanumericType is CharsUpperAlphanumeric
 	AlphanumericUpper
-	//AlphanumericCase alphanumericType is CharsLowerAlphanumeric
+
+	//AlphanumericLower alphanumericType is CharsLowerAlphanumeric
 	AlphanumericLower
 )
 
