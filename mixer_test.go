@@ -43,3 +43,15 @@ func TestMixer(t *testing.T) {
 func TestHex(t *testing.T) {
 	t.Logf("%v", hex.EncodeToString([]byte("Hello Mixer")))
 }
+
+func TestRandomize(t *testing.T) {
+	chars := []rune("abcdefg")
+	t.Logf("%v", chars)
+	for i := 0; i < 10; i++ {
+		rnChars := randomEncode(chars, 12345)
+		t.Logf("src:%v|out:%v", chars, rnChars)
+		revChars := randomDecode(rnChars, 12345)
+		t.Logf("src:%v|rev:%v", chars, revChars)
+	}
+
+}

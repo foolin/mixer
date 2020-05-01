@@ -108,12 +108,12 @@ func (m Mixer) Encode(data []rune) []rune {
 			outChars[i] = c
 		}
 	}
-	return upset(outChars, false, m.saltSeed)
+	return randomEncode(outChars, m.saltSeed)
 }
 
 //Decode decode char array
 func (m Mixer) Decode(data []rune) []rune {
-	outChars := upset(data, true, m.saltSeed) //先倒序
+	outChars := randomDecode(data, m.saltSeed)
 	for i, c := range outChars {
 		if rc, ok := m.mapDecodeDict[c]; ok {
 			outChars[i] = rc
@@ -135,7 +135,7 @@ func (m Mixer) DecodeString(data string) string {
 }
 
 func appendDictTable(dictMaps map[rune]rune, dictChars []rune, seed int64) map[rune]rune {
-	rnChars := randomize(dictChars, seed)
+	rnChars := randomEncode(dictChars, seed)
 	if dictMaps == nil {
 		dictMaps = make(map[rune]rune, 0)
 	}
@@ -150,21 +150,7 @@ func appendDictTable(dictMaps map[rune]rune, dictChars []rune, seed int64) map[r
 	return dictMaps
 }
 
-func upset(data []rune, isReverse bool, seed int64) []rune {
-	size := len(data)
-	factor := int(seed % int64(size))
-	if isReverse {
-		factor *= -1
-	}
-	outData := make([]rune, len(data))
-	for i := 0; i < size; i++ {
-		offset := (size + i + factor) % size
-		outData[offset] = data[i]
-	}
-	return outData
-}
-
-func randomize(chars []rune, seed int64) []rune {
+func randomEncode(chars []rune, seed int64) []rune {
 	src := chars
 	final := make([]rune, len(src))
 	rn := rand.New(rand.NewSource(seed))
@@ -172,6 +158,17 @@ func randomize(chars []rune, seed int64) []rune {
 
 	for i, v := range perm {
 		final[v] = src[i]
+	}
+	return final
+}
+
+func randomDecode(chars []rune, seed int64) []rune {
+	src := chars
+	final := make([]rune, len(src))
+	rn := rand.New(rand.NewSource(seed))
+	perm := rn.Perm(len(src))
+	for i, v := range perm {
+		final[i] = src[v]
 	}
 	return final
 }
