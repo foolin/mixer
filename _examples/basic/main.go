@@ -19,7 +19,6 @@ func main() {
 	mix := mixer.NewHex(salt)
 
 	for _, source := range sources {
-
 		encodeData := mix.EncodeString(source)
 		decodeData := mix.DecodeString(encodeData)
 		if source != decodeData {

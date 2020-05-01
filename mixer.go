@@ -6,27 +6,27 @@ import (
 	"math/rand"
 )
 
-var (
-	//DictCaseAlphanumeric the alphanumeric include upper and lower:`0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ`
-	DictCaseAlphanumeric = []rune("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
+const (
+	//CharsCaseAlphanumeric the alphanumeric include upper and lower:`0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ`
+	CharsCaseAlphanumeric = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
-	//DictUpperAlphanumeric the alphanumeric include upper:`0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ`
-	DictUpperAlphanumeric = []rune("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ")
+	//CharsUpperAlphanumeric the alphanumeric include upper:`0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ`
+	CharsUpperAlphanumeric = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
-	//DictLowerAlphanumeric the alphanumeric include lower:`0123456789abcdefghijklmnopqrstuvwxyz`
-	DictLowerAlphanumeric = []rune("0123456789abcdefghijklmnopqrstuvwxyz")
+	//CharsLowerAlphanumeric the alphanumeric include lower:`0123456789abcdefghijklmnopqrstuvwxyz`
+	CharsLowerAlphanumeric = "0123456789abcdefghijklmnopqrstuvwxyz"
 
-	//DictUpperAlphabet the upper alphabet:`ABCDEFGHIJKLMNOPQRSTUVWXYZ`
-	DictUpperAlphabet = []rune("ABCDEFGHIJKLMNOPQRSTUVWXYZ")
+	//CharsUpperAlphabet the upper alphabet:`ABCDEFGHIJKLMNOPQRSTUVWXYZ`
+	CharsUpperAlphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
-	//DictLowerAlphabet the lower alphabet:`abcdefghijklmnopqrstuvwxyz`
-	DictLowerAlphabet = []rune("abcdefghijklmnopqrstuvwxyz")
+	//CharsLowerAlphabet the lower alphabet:`abcdefghijklmnopqrstuvwxyz`
+	CharsLowerAlphabet = "abcdefghijklmnopqrstuvwxyz"
 
-	//DictHex the hex alphabet and numeric:`0123456789abcdef`
-	DictHex = []rune("0123456789abcdef")
+	//CharsHex the hex alphabet and numeric:`0123456789abcdef`
+	CharsHex = "0123456789abcdef"
 
-	//DictNumeric the numeric:`0123456789abcdef`
-	DictNumeric = []rune("0123456789")
+	//CharsNumeric the numeric:`0123456789abcdef`
+	CharsNumeric = "0123456789"
 )
 
 const (
@@ -36,39 +36,39 @@ const (
 )
 
 type Mixer struct {
-	saltSeed      int64
-	mapEncodeDict map[rune]rune
-	mapDecodeDict map[rune]rune
+	saltSeed       int64
+	mapEncodeChars map[rune]rune
+	mapDecodeChars map[rune]rune
 }
 
 //New create a new mixer
-func New(salt string, dictChars []rune, moreDictChars ...[]rune) (*Mixer, error) {
-	if len(dictChars) <= 0 {
+func New(salt string, chars string, candidateChars ...string) (*Mixer, error) {
+	if chars == "" {
 		return nil, errors.New("at least one of `dictChars` parameters is required")
 	}
 	seed := sumSaltSeed(salt)
 	mapEncodeTable := make(map[rune]rune, 0)
-	mapEncodeTable = appendDictTable(mapEncodeTable, dictChars, seed)
-	for _, v := range moreDictChars {
-		mapEncodeTable = appendDictTable(mapEncodeTable, v, seed)
+	mapEncodeTable = appendChars(mapEncodeTable, chars, seed)
+	for _, v := range candidateChars {
+		mapEncodeTable = appendChars(mapEncodeTable, v, seed)
 	}
 	if len(mapEncodeTable) < 2 {
-		return nil, fmt.Errorf("dict chars `%v` is not invalid", string(dictChars))
+		return nil, fmt.Errorf("dict chars `%v` is not invalid", chars)
 	}
 	mapDecodeTable := make(map[rune]rune, 0)
 	for k, v := range mapEncodeTable {
 		mapDecodeTable[v] = k
 	}
 	return &Mixer{
-		saltSeed:      seed,
-		mapEncodeDict: mapEncodeTable,
-		mapDecodeDict: mapDecodeTable,
+		saltSeed:       seed,
+		mapEncodeChars: mapEncodeTable,
+		mapDecodeChars: mapDecodeTable,
 	}, nil
 }
 
 //MustNew must create a new mixer
-func MustNew(salt string, dictChars []rune, moreDictChars ...[]rune) *Mixer {
-	mixer, err := New(salt, dictChars, moreDictChars...)
+func MustNew(salt string, chars string, moreChars ...string) *Mixer {
+	mixer, err := New(salt, chars, moreChars...)
 	if err != nil {
 		panic(err)
 	}
@@ -79,30 +79,30 @@ func MustNew(salt string, dictChars []rune, moreDictChars ...[]rune) *Mixer {
 func NewAlphanumeric(salt string, alphanumericType int) *Mixer {
 	switch alphanumericType {
 	case AlphanumericUpper:
-		return MustNew(salt, DictUpperAlphabet)
+		return MustNew(salt, CharsUpperAlphabet)
 	case AlphanumericLower:
-		return MustNew(salt, DictLowerAlphanumeric)
+		return MustNew(salt, CharsLowerAlphanumeric)
 	case AlphanumericCase:
-		return MustNew(salt, DictCaseAlphanumeric)
+		return MustNew(salt, CharsCaseAlphanumeric)
 	}
-	return MustNew(salt, DictCaseAlphanumeric)
+	return MustNew(salt, CharsCaseAlphanumeric)
 }
 
 //NewHex must create a new mixer with hex
 func NewHex(salt string) *Mixer {
-	return MustNew(salt, DictHex)
+	return MustNew(salt, CharsHex)
 }
 
 //NewNumeric must create a new mixer with numeric
 func NewNumeric(salt string) *Mixer {
-	return MustNew(salt, DictNumeric)
+	return MustNew(salt, CharsNumeric)
 }
 
 //Encode encode char array
 func (m Mixer) Encode(data []rune) []rune {
 	outChars := make([]rune, len(data))
 	for i, c := range data {
-		if v, ok := m.mapEncodeDict[c]; ok {
+		if v, ok := m.mapEncodeChars[c]; ok {
 			outChars[i] = v
 		} else {
 			outChars[i] = c
@@ -115,7 +115,7 @@ func (m Mixer) Encode(data []rune) []rune {
 func (m Mixer) Decode(data []rune) []rune {
 	outChars := randomDecode(data, m.saltSeed)
 	for i, c := range outChars {
-		if rc, ok := m.mapDecodeDict[c]; ok {
+		if rc, ok := m.mapDecodeChars[c]; ok {
 			outChars[i] = rc
 		} else {
 			outChars[i] = c
@@ -134,7 +134,26 @@ func (m Mixer) DecodeString(data string) string {
 	return string(m.Decode([]rune(data)))
 }
 
-func appendDictTable(dictMaps map[rune]rune, dictChars []rune, seed int64) map[rune]rune {
+func uniqueChars(chars string) []rune {
+	// Use map to record duplicates as we find them.
+	mapCheck := make(map[rune]bool)
+	list := make([]rune, 0)
+	for _, v := range []rune(chars) {
+		if mapCheck[v] == true {
+			// Do not add duplicate.
+		} else {
+			// Record this element as an encountered element.
+			mapCheck[v] = true
+			// Append to list slice.
+			list = append(list, v)
+		}
+	}
+	// Return the new slice.
+	return list
+}
+
+func appendChars(dictMaps map[rune]rune, chars string, seed int64) map[rune]rune {
+	dictChars := uniqueChars(chars)
 	rnChars := randomEncode(dictChars, seed)
 	if dictMaps == nil {
 		dictMaps = make(map[rune]rune, 0)

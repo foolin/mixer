@@ -6,18 +6,20 @@ import (
 )
 
 func TestMixer(t *testing.T) {
-	salt := "123456"
-	alphanumericAndUpperMixer, _ := New(salt, DictLowerAlphanumeric, DictLowerAlphabet)
-	myDictChars, _ := New(salt, []rune("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_!*()%$!@"))
-	mixers := map[string]*Mixer{
-		"AlphanumericCase":          NewAlphanumeric(salt, AlphanumericCase),
-		"AlphanumericUpper":         NewAlphanumeric(salt, AlphanumericUpper),
-		"AlphanumericLower":         NewAlphanumeric(salt, AlphanumericLower),
-		"Hex":                       NewHex(salt),
-		"Numeric":                   NewNumeric(salt),
-		"alphanumericAndUpperMixer": alphanumericAndUpperMixer,
-		"myDictChars":               myDictChars,
+	runTest(t, true)
+}
+
+func TestMixerTimes(t *testing.T) {
+	//10,000 tests
+	for times := 0; times <= 10000; times++ {
+		runTest(t, false)
 	}
+}
+
+func runTest(t *testing.T, isLog bool) {
+	salt := "123456"
+	alphanumericAndUpperMixer, _ := New(salt, CharsLowerAlphanumeric, CharsLowerAlphabet)
+	myCharsChars, _ := New(salt, "0123456789ABCabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-_@!", "0123456789ABCEF&^%")
 	sources := []string{
 		"HelloMixer",
 		"Hello@Mixer!",
@@ -26,18 +28,31 @@ func TestMixer(t *testing.T) {
 		"46653FD803893E4F75696240258265D2",
 	}
 
+	mixers := []struct {
+		Name  string
+		Mixer *Mixer
+	}{
+		{"AlphanumericCase", NewAlphanumeric(salt, AlphanumericCase)},
+		{"AlphanumericUpper", NewAlphanumeric(salt, AlphanumericUpper)},
+		{"AlphanumericLower", NewAlphanumeric(salt, AlphanumericLower)},
+		{"Hex", NewHex(salt)},
+		{"Numeric", NewNumeric(salt)},
+		{"alphanumericAndUpperMixer", alphanumericAndUpperMixer},
+		{"myCharsChars", myCharsChars},
+	}
 	for _, source := range sources {
-		for name, mixer := range mixers {
-			encodeData := mixer.EncodeString(source)
-			decodeData := mixer.DecodeString(encodeData)
+		for _, m := range mixers {
+			encodeData := m.Mixer.EncodeString(source)
+			decodeData := m.Mixer.DecodeString(encodeData)
 			if source != decodeData {
 				t.Fatalf("error: decode data not equal\n mixer: %v\nsource: %v\nencode: %v\ndecode: %v",
-					name, source, encodeData, decodeData)
+					m.Name, source, encodeData, decodeData)
 			}
-			t.Logf("-------\n mixer: %v\nsource: %v\nencode: %v\ndecode: %v", name, source, encodeData, decodeData)
+			if isLog {
+				t.Logf("-------\n mixer: %v\nsource: %v\nencode: %v\ndecode: %v", m.Name, source, encodeData, decodeData)
+			}
 		}
 	}
-
 }
 
 func TestHex(t *testing.T) {

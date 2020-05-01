@@ -68,19 +68,20 @@ Run output:
 
 -------
 source: 1234456
-encode: 8e03227
+encode: 72e2308
 decode: 1234456
 -------
 -------
 source: 12345abcedf
-encode: 94e0327cd5f
+encode: 47e235f9d0c
 decode: 12345abcedf
 -------
 -------
 source: 48656c6c6f204d69786572
-encode: b026878585840a2981b687
+encode: 7827858a8629541806bb08
 decode: 48656c6c6f204d69786572
 -------
+
 
 ```
 
