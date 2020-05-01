@@ -82,7 +82,6 @@ encode: b026878585840a2981b687
 decode: 48656c6c6f204d69786572
 -------
 
-
 ```
 
 [go-doc]: https://pkg.go.dev/github.com/foolin/mixer
