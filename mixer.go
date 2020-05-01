@@ -30,8 +30,11 @@ const (
 )
 
 const (
+	//AlphanumericCase alphanumericType is CharsCaseAlphanumeric
 	AlphanumericCase = iota
+	//AlphanumericCase alphanumericType is CharsUpperAlphanumeric
 	AlphanumericUpper
+	//AlphanumericCase alphanumericType is CharsLowerAlphanumeric
 	AlphanumericLower
 )
 
@@ -79,7 +82,7 @@ func MustNew(salt string, chars string, moreChars ...string) *Mixer {
 func NewAlphanumeric(salt string, alphanumericType int) *Mixer {
 	switch alphanumericType {
 	case AlphanumericUpper:
-		return MustNew(salt, CharsUpperAlphabet)
+		return MustNew(salt, CharsUpperAlphanumeric)
 	case AlphanumericLower:
 		return MustNew(salt, CharsLowerAlphanumeric)
 	case AlphanumericCase:

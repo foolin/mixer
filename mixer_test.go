@@ -18,7 +18,7 @@ func TestMixerTimes(t *testing.T) {
 
 func runTest(t *testing.T, isLog bool) {
 	salt := "123456"
-	alphanumericAndUpperMixer, _ := New(salt, CharsLowerAlphanumeric, CharsLowerAlphabet)
+	alphanumericAndUpperMixer, _ := New(salt, CharsNumeric, CharsLowerAlphabet, CharsUpperAlphabet)
 	myCharsChars, _ := New(salt, "0123456789ABCabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-_@!", "0123456789ABCEF&^%")
 	sources := []string{
 		"HelloMixer",
