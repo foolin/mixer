@@ -40,6 +40,7 @@ const (
 	AlphanumericLower
 )
 
+//Mixer a mixer instance for encode/decode
 type Mixer struct {
 	saltSeed       int64
 	mapEncodeChars map[rune]rune
@@ -80,7 +81,7 @@ func MustNew(salt string, chars string, moreChars ...string) *Mixer {
 	return mixer
 }
 
-//MustNew must create a new mixer with alphanumeric
+//NewAlphanumeric must create a new mixer with alphanumeric
 func NewAlphanumeric(salt string, alphanumericType int) *Mixer {
 	switch alphanumericType {
 	case AlphanumericUpper:
@@ -129,7 +130,7 @@ func (m Mixer) Decode(data []rune) []rune {
 	return outChars
 }
 
-//Encode encode string
+//EncodeString encode string
 func (m Mixer) EncodeString(data string) string {
 	return string(m.Encode([]rune(data)))
 }
