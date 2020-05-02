@@ -45,8 +45,10 @@ import (
 
 func main() {
 
+	//password
 	salt := "a1b2c3d4"
 
+	//the source to be encrypted
 	sources := []string{
 		"1234456",
 		"12345abcedf",
