@@ -98,7 +98,7 @@ decode: 48656c6c6f204d69786572
 [go-doc]: https://pkg.go.dev/github.com/foolin/mixer
 [go-doc-img]: https://godoc.org/github.com/foolin/mixer?status.svg
 [travis]: https://travis-ci.org/foolin/mixer
-[travis-img]: https://travis-ci.org/foolin/mixer.svg?branch=master
+[travis-img]: https://travis-ci.org/foolin/mixer.svg?branch=master&t=mixer
 [go-report-card]: https://goreportcard.com/report/github.com/foolin/mixer
 [go-report-card-img]: https://goreportcard.com/badge/github.com/foolin/mixer
 [cov-img]: https://codecov.io/gh/foolin/mixer/branch/master/graph/badge.svg
