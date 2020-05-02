@@ -18,6 +18,13 @@ go get github.com/foolin/mixer@{version}
 ```
 The {version} release list: <https://github.com/foolin/mixer/releases>
 
+## Features
+
+* **Security** - Support salt(password) to encrypt.
+* **Simple** - The encryption algorithm works by replacing and mixing characters.
+* **Equal length** - The length of the encrypted string is equal to the length of the original string.
+* **Symmetrical** Support decrypt from the encrypted string.
+* **Custom** Support custom characters library.
 
 # Docs
 
