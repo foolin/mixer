@@ -6,6 +6,15 @@
 Mixer is a very simple encrypt and decrypt golang library for short strings such as id or hash.
 
 
+## Features
+
+* **Security** - Support for password(salt) encryption.
+* **Symmetrical** Support decrypt from the encrypted string.
+* **Equal length** - The length of the encrypted string is equal to the length of the original string.
+* **Simple** - The encryption algorithm works by replacing and mixing characters.
+* **Custom** Support for custom replacement characters.
+
+
 ## Install
 
 ```bash
@@ -17,14 +26,6 @@ Or get the specified version:
 go get github.com/foolin/mixer@{version}
 ```
 The {version} release list: <https://github.com/foolin/mixer/releases>
-
-## Features
-
-* **Security** - Support for password(salt) encryption.
-* **Symmetrical** Support decrypt from the encrypted string.
-* **Equal length** - The length of the encrypted string is equal to the length of the original string.
-* **Simple** - The encryption algorithm works by replacing and mixing characters.
-* **Custom** Support for custom replacement characters.
 
 # Docs
 
