@@ -33,7 +33,6 @@ package main
 import (
 	"fmt"
 	"github.com/foolin/mixer"
-	"log"
 )
 
 func main() {
@@ -46,19 +45,22 @@ func main() {
 		"48656c6c6f204d69786572",
 	}
 
-	mix := mixer.NewHex(salt)
+	//NewHex(salt string, upper bool) create a new Mixer
+	mix := mixer.NewHex(salt, false)
 
 	for _, source := range sources {
 
+		//Encode source data
 		encodeData := mix.EncodeString(source)
+
+		//Decode source data
 		decodeData := mix.DecodeString(encodeData)
-		if source != decodeData {
-			log.Fatalf("error: decode data not equal\nsource: %v\nencode: %v\ndecode: %v",
-				source, encodeData, decodeData)
-		}
+
+		//Output result
 		fmt.Printf("-------\nsource: %v\nencode: %v\ndecode: %v\n-------\n", source, encodeData, decodeData)
 	}
 }
+
 
 
 ```

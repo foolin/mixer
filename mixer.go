@@ -22,8 +22,11 @@ const (
 	//CharsLowerAlphabet the lower alphabet:`abcdefghijklmnopqrstuvwxyz`
 	CharsLowerAlphabet = "abcdefghijklmnopqrstuvwxyz"
 
-	//CharsHex the hex alphabet and numeric:`0123456789abcdef`
-	CharsHex = "0123456789abcdef"
+	//CharsUpperHex the hex alphabet and numeric:`0123456789abcdef`
+	CharsUpperHex = "0123456789ABCDEF"
+
+	//CharsLowerHex the hex alphabet and numeric:`0123456789abcdef`
+	CharsLowerHex = "0123456789abcdef"
 
 	//CharsNumeric the numeric:`0123456789abcdef`
 	CharsNumeric = "0123456789"
@@ -73,8 +76,8 @@ func New(salt string, chars string, candidateChars ...string) (*Mixer, error) {
 }
 
 //MustNew must create a new mixer
-func MustNew(salt string, chars string, moreChars ...string) *Mixer {
-	mixer, err := New(salt, chars, moreChars...)
+func MustNew(salt string, chars string, candidateChars ...string) *Mixer {
+	mixer, err := New(salt, chars, candidateChars...)
 	if err != nil {
 		panic(err)
 	}
@@ -95,8 +98,11 @@ func NewAlphanumeric(salt string, alphanumericType int) *Mixer {
 }
 
 //NewHex must create a new mixer with hex
-func NewHex(salt string) *Mixer {
-	return MustNew(salt, CharsHex)
+func NewHex(salt string, upper bool) *Mixer {
+	if upper {
+		return MustNew(salt, CharsUpperHex)
+	}
+	return MustNew(salt, CharsLowerHex)
 }
 
 //NewNumeric must create a new mixer with numeric
