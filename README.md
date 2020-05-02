@@ -50,7 +50,7 @@ func main() {
 
 	//the source to be encrypted
 	sources := []string{
-		"1234456",
+		"123456",
 		"12345abcedf",
 		"48656c6c6f204d69786572",
 	}
@@ -71,17 +71,15 @@ func main() {
 	}
 }
 
-
-
 ```
 
 Run output:
 ```
 
 -------
-source: 1234456
-encode: 72e2308
-decode: 1234456
+source: 123456
+encode: 87e230
+decode: 123456
 -------
 -------
 source: 12345abcedf
