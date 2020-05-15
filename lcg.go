@@ -5,10 +5,12 @@ import (
 )
 
 const (
-	LcgDefaultMudu int64 = 4294967296 //math.Pow(2.0, 32.0)
-	LcgDefaultMult int64 = 1103515245
-	LcgDefaultInc  int64 = 12345
-	LcgMaxRand     int64 = 4294967295
+	//LcgDefaultModulus default modulus
+	LcgDefaultModulus int64 = 4294967296 //math.Pow(2.0, 32.0)
+	//LcgDefaultMultiplier default multiplier
+	LcgDefaultMultiplier int64 = 1103515245
+	//LcgDefaultIncrement default increment
+	LcgDefaultIncrement int64 = 12345
 )
 
 //LCGRandom linear congruential generator
@@ -22,13 +24,13 @@ type LCGRandom struct {
 
 //NewLGC new LGC random
 func NewLGC(seed int64) *LCGRandom {
-	return NewLGCWith(seed, LcgDefaultMudu, LcgDefaultMult, LcgDefaultInc)
+	return NewLGCWith(seed, LcgDefaultModulus, LcgDefaultMultiplier, LcgDefaultIncrement)
 }
 
-//NewLGC new LGC with more parameters.
+//NewLGCWith new LGC with more parameters.
 func NewLGCWith(seed, modulus, multiplier, increment int64) *LCGRandom {
 	return &LCGRandom{
-		state:      seed % LcgMaxRand,
+		state:      seed,
 		modulus:    modulus,
 		multiplier: multiplier,
 		increment:  increment,
