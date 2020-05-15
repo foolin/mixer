@@ -17,18 +17,31 @@ func main() {
 		"48656c6c6f204d69786572",
 	}
 
-	//NewHex(salt string, upper bool) create a new Mixer
-	mix := mixer.NewHex(salt, false)
+	mixers := []struct {
+		Name  string
+		Mixer *mixer.Mixer
+	}{
+		//create a new mixer with case sensitive alphanumeric
+		{"New(salt)", mixer.New(salt)},
 
-	for _, source := range sources {
-
-		//Encode source data
-		encodeData := mix.EncodeString(source)
-
-		//Decode source data
-		decodeData := mix.DecodeString(encodeData)
-
-		//Output result
-		fmt.Printf("-------\nsource: %v\nencode: %v\ndecode: %v\n-------\n", source, encodeData, decodeData)
+		//create a new mixer with lowercase  alphanumeric
+		{"Newt(salt, AlphanumericLower)", mixer.Newt(salt, mixer.AlphanumericLower)},
 	}
+
+	//foreach every source
+	for _, source := range sources {
+		//foreach mixer for encode and decode
+		for _, m := range mixers {
+			//Encode source data
+			encodeData := m.Mixer.EncodeString(source)
+
+			//Decode source data
+			decodeData := m.Mixer.DecodeString(encodeData)
+
+			//Output result
+			fmt.Printf("-------\n mixer: %v\nsource: %v\nencode: %v\ndecode: %v\n-------\n",
+				m.Name, source, encodeData, decodeData)
+		}
+	}
+
 }

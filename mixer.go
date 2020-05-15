@@ -31,14 +31,17 @@ const (
 	CharsNumeric = "0123456789"
 )
 
-const (
-	//AlphanumericCase alphanumericType is CharsCaseAlphanumeric
-	AlphanumericCase = iota
+//AlphanumericType alphanumeric type
+type AlphanumericType int
 
-	//AlphanumericUpper alphanumericType is CharsUpperAlphanumeric
+const (
+	//AlphanumericCase AlphanumericType is CharsCaseAlphanumeric
+	AlphanumericCase AlphanumericType = iota
+
+	//AlphanumericUpper AlphanumericType is CharsUpperAlphanumeric
 	AlphanumericUpper
 
-	//AlphanumericLower alphanumericType is CharsLowerAlphanumeric
+	//AlphanumericLower AlphanumericType is CharsLowerAlphanumeric
 	AlphanumericLower
 )
 
@@ -49,8 +52,8 @@ type Mixer struct {
 	mapDecodeChars map[rune]rune
 }
 
-//New create a new mixer
-func New(salt string, chars string, candidateChars ...string) (*Mixer, error) {
+//NewWithChars create a new mixer
+func NewWithChars(salt string, chars string, candidateChars ...string) (*Mixer, error) {
 	if chars == "" {
 		return nil, errors.New("at least one of `dictChars` parameters is required")
 	}
@@ -74,39 +77,31 @@ func New(salt string, chars string, candidateChars ...string) (*Mixer, error) {
 	}, nil
 }
 
-//MustNew must create a new mixer
-func MustNew(salt string, chars string, candidateChars ...string) *Mixer {
-	mixer, err := New(salt, chars, candidateChars...)
+//MustNewWithChars must create a new mixer
+func MustNewWithChars(salt string, chars string, candidateChars ...string) *Mixer {
+	mixer, err := NewWithChars(salt, chars, candidateChars...)
 	if err != nil {
 		panic(err)
 	}
 	return mixer
 }
 
-//NewAlphanumeric must create a new mixer with alphanumeric
-func NewAlphanumeric(salt string, alphanumericType int) *Mixer {
+//New create a new mixer with case sensitive alphanumeric
+func New(salt string) *Mixer {
+	return Newt(salt, AlphanumericCase)
+}
+
+//Newt create a new mixer with alphanumeric and AlphanumericType
+func Newt(salt string, alphanumericType AlphanumericType) *Mixer {
 	switch alphanumericType {
 	case AlphanumericUpper:
-		return MustNew(salt, CharsUpperAlphanumeric)
+		return MustNewWithChars(salt, CharsUpperAlphanumeric)
 	case AlphanumericLower:
-		return MustNew(salt, CharsLowerAlphanumeric)
+		return MustNewWithChars(salt, CharsLowerAlphanumeric)
 	case AlphanumericCase:
-		return MustNew(salt, CharsCaseAlphanumeric)
+		return MustNewWithChars(salt, CharsCaseAlphanumeric)
 	}
-	return MustNew(salt, CharsCaseAlphanumeric)
-}
-
-//NewHex must create a new mixer with hex
-func NewHex(salt string, upper bool) *Mixer {
-	if upper {
-		return MustNew(salt, CharsUpperHex)
-	}
-	return MustNew(salt, CharsLowerHex)
-}
-
-//NewNumeric must create a new mixer with numeric
-func NewNumeric(salt string) *Mixer {
-	return MustNew(salt, CharsNumeric)
+	return MustNewWithChars(salt, CharsCaseAlphanumeric)
 }
 
 //Encode encode char array

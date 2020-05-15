@@ -18,8 +18,8 @@ func TestMixerTimes(t *testing.T) {
 
 func runTest(t *testing.T, isLog bool) {
 	salt := "123456"
-	alphanumericAndUpperMixer, _ := New(salt, CharsNumeric, CharsLowerAlphabet, CharsUpperAlphabet)
-	myCharsChars, _ := New(salt, "0123456789ABCabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-_@!", "0123456789ABCEF&^%")
+	alphanumericAndUpperMixer := New(salt)
+	myCharsChars, _ := NewWithChars(salt, "0123456789ABCabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-_@!", "0123456789ABCEF&^%")
 	sources := []string{
 		"HelloMixer",
 		"Hello@Mixer!",
@@ -32,12 +32,12 @@ func runTest(t *testing.T, isLog bool) {
 		Name  string
 		Mixer *Mixer
 	}{
-		{"AlphanumericCase", NewAlphanumeric(salt, AlphanumericCase)},
-		{"AlphanumericUpper", NewAlphanumeric(salt, AlphanumericUpper)},
-		{"AlphanumericLower", NewAlphanumeric(salt, AlphanumericLower)},
-		{"HexUpper", NewHex(salt, true)},
-		{"HexLower", NewHex(salt, false)},
-		{"Numeric", NewNumeric(salt)},
+		{"AlphanumericCase", Newt(salt, AlphanumericCase)},
+		{"AlphanumericUpper", Newt(salt, AlphanumericUpper)},
+		{"AlphanumericLower", Newt(salt, AlphanumericLower)},
+		{"HexUpper", MustNewWithChars(salt, CharsUpperHex)},
+		{"HexLower", MustNewWithChars(salt, CharsLowerHex)},
+		{"Numeric", New(salt)},
 		{"alphanumericAndUpperMixer", alphanumericAndUpperMixer},
 		{"myCharsChars", myCharsChars},
 	}
