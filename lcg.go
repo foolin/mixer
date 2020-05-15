@@ -11,7 +11,7 @@ const (
 	LcgMaxRand     int64 = 4294967295
 )
 
-//linear congruential generator
+//LCGRandom linear congruential generator
 type LCGRandom struct {
 	state      int64
 	modulus    int64
@@ -20,10 +20,12 @@ type LCGRandom struct {
 	lock       sync.Mutex
 }
 
+//NewLGC new LGC random
 func NewLGC(seed int64) *LCGRandom {
 	return NewLGCWith(seed, LcgDefaultMudu, LcgDefaultMult, LcgDefaultInc)
 }
 
+//NewLGC new LGC with more parameters.
 func NewLGCWith(seed, modulus, multiplier, increment int64) *LCGRandom {
 	return &LCGRandom{
 		state:      seed % LcgMaxRand,
@@ -33,6 +35,7 @@ func NewLGCWith(seed, modulus, multiplier, increment int64) *LCGRandom {
 	}
 }
 
+// Int64 next random number
 func (g *LCGRandom) Int64() int64 {
 	g.lock.Lock()
 	defer g.lock.Unlock()
@@ -40,10 +43,12 @@ func (g *LCGRandom) Int64() int64 {
 	return g.state
 }
 
+// Int64n next random int64 number in [0,n)
 func (g *LCGRandom) Int64n(n int64) int64 {
 	return g.Int64() % n
 }
 
+// Intn next random int number in [0,n)
 func (g *LCGRandom) Intn(n int) int {
 	return int(g.Int64n(int64(n)))
 }
