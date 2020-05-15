@@ -13,6 +13,7 @@ Mixer is a very simple encrypt and decrypt golang library for short strings such
 * **Equal length** - The length of the encrypted string is equal to the length of the original string.
 * **Simple** - The encryption algorithm works by replacing and mixing characters.
 * **Custom** Support for custom replacement characters.
+* **LCG algorithm** Use Linear Congruential Generator (LCG) algorithm to generate pseudorandom numbers.
 
 
 ## Install
@@ -78,19 +79,20 @@ Run output:
 
 -------
 source: 123456
-encode: 87e230
+encode: 05139e
 decode: 123456
 -------
 -------
 source: 12345abcedf
-encode: 47e235f9d0c
+encode: d513a8ce704
 decode: 12345abcedf
 -------
 -------
 source: 48656c6c6f204d69786572
-encode: 7827858a8629541806bb08
+encode: 9eb58942619f9bf9ce1589
 decode: 48656c6c6f204d69786572
 -------
+
 
 
 ```

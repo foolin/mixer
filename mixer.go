@@ -3,7 +3,6 @@ package mixer
 import (
 	"errors"
 	"fmt"
-	"math/rand"
 )
 
 const (
@@ -184,7 +183,7 @@ func appendChars(dictMaps map[rune]rune, chars string, seed int64) map[rune]rune
 func randomEncode(chars []rune, seed int64) []rune {
 	src := chars
 	final := make([]rune, len(src))
-	rn := rand.New(rand.NewSource(seed))
+	rn := NewLGC(seed)
 	perm := rn.Perm(len(src))
 
 	for i, v := range perm {
@@ -196,7 +195,7 @@ func randomEncode(chars []rune, seed int64) []rune {
 func randomDecode(chars []rune, seed int64) []rune {
 	src := chars
 	final := make([]rune, len(src))
-	rn := rand.New(rand.NewSource(seed))
+	rn := NewLGC(seed)
 	perm := rn.Perm(len(src))
 	for i, v := range perm {
 		final[i] = src[v]
