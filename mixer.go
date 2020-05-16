@@ -14,7 +14,7 @@ const (
 var (
 
 	//StdMixer
-	StdMixer = AlphanumericCaseMixer
+	StdMixer = AlphanumericLowerMixer
 
 	//AlphanumericCaseMixer the alphanumeric include upper and lower:`0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ`
 	AlphanumericCaseMixer = MustNewWith(defaultSalt, "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
