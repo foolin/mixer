@@ -3,7 +3,25 @@ package mixer
 import (
 	"encoding/hex"
 	"testing"
+	"time"
 )
+
+var alphanumericAndUpperMixer = New(salt)
+var myCharsChars, _ = NewWithChars(salt, "0123456789ABCabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-_@!", "0123456789ABCEF&^%")
+var salt = "123456"
+var testMixers = []struct {
+	Name  string
+	Mixer *Mixer
+}{
+	{"AlphanumericCase", Newt(salt, AlphanumericCase)},
+	{"AlphanumericUpper", Newt(salt, AlphanumericUpper)},
+	{"AlphanumericLower", Newt(salt, AlphanumericLower)},
+	{"HexUpper", MustNewWithChars(salt, CharsUpperHex)},
+	{"HexLower", MustNewWithChars(salt, CharsLowerHex)},
+	{"Numeric", New(salt)},
+	{"alphanumericAndUpperMixer", alphanumericAndUpperMixer},
+	{"myCharsChars", myCharsChars},
+}
 
 func TestMixer(t *testing.T) {
 	runTest(t, true)
@@ -17,9 +35,6 @@ func TestMixerTimes(t *testing.T) {
 }
 
 func runTest(t *testing.T, isLog bool) {
-	salt := "123456"
-	alphanumericAndUpperMixer := New(salt)
-	myCharsChars, _ := NewWithChars(salt, "0123456789ABCabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-_@!", "0123456789ABCEF&^%")
 	sources := []string{
 		"HelloMixer",
 		"Hello@Mixer!",
@@ -28,21 +43,8 @@ func runTest(t *testing.T, isLog bool) {
 		"46653FD803893E4F75696240258265D2",
 	}
 
-	mixers := []struct {
-		Name  string
-		Mixer *Mixer
-	}{
-		{"AlphanumericCase", Newt(salt, AlphanumericCase)},
-		{"AlphanumericUpper", Newt(salt, AlphanumericUpper)},
-		{"AlphanumericLower", Newt(salt, AlphanumericLower)},
-		{"HexUpper", MustNewWithChars(salt, CharsUpperHex)},
-		{"HexLower", MustNewWithChars(salt, CharsLowerHex)},
-		{"Numeric", New(salt)},
-		{"alphanumericAndUpperMixer", alphanumericAndUpperMixer},
-		{"myCharsChars", myCharsChars},
-	}
 	for _, source := range sources {
-		for _, m := range mixers {
+		for _, m := range testMixers {
 			encodeData := m.Mixer.EncodeString(source)
 			decodeData := m.Mixer.DecodeString(encodeData)
 			if source != decodeData {
@@ -58,6 +60,30 @@ func runTest(t *testing.T, isLog bool) {
 
 func TestHex(t *testing.T) {
 	t.Logf("%v", hex.EncodeToString([]byte("Hello Mixer")))
+}
+
+func TestMixer_EncodeInt64(t *testing.T) {
+	sources := []int64{
+		1,
+		12,
+		123,
+		123456789,
+		time.Now().Unix(),
+	}
+	for _, source := range sources {
+		for _, m := range testMixers {
+			encodeData := m.Mixer.EncodeInt64(source)
+			decodeData, err := m.Mixer.DecodeInt64(encodeData)
+			if err != nil {
+				t.Fatalf("error: %v", err)
+			}
+			if source != decodeData {
+				t.Fatalf("error: decode data not equal\n mixer: %v\nsource: %v\nencode: %v\ndecode: %v",
+					m.Name, source, encodeData, decodeData)
+			}
+			t.Logf("-------\n mixer: %v\nsource: %v\nencode: %v\ndecode: %v", m.Name, source, encodeData, decodeData)
+		}
+	}
 }
 
 func TestRandomize(t *testing.T) {

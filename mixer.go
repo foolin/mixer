@@ -3,6 +3,7 @@ package mixer
 import (
 	"errors"
 	"fmt"
+	"strconv"
 )
 
 const (
@@ -128,6 +129,21 @@ func (m Mixer) Decode(data []rune) []rune {
 		}
 	}
 	return outChars
+}
+
+//EncodeString encode string
+func (m Mixer) EncodeInt64(value int64) string {
+	return m.EncodeString(fmt.Sprintf("%v", value*m.saltSeed))
+}
+
+//DecodeString decode string
+func (m Mixer) DecodeInt64(data string) (int64, error) {
+	deStr := m.DecodeString(data)
+	val, err := strconv.ParseInt(deStr, 10, 64)
+	if err != nil {
+		return 0, err
+	}
+	return val / m.saltSeed, nil
 }
 
 //EncodeString encode string
