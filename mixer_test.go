@@ -25,7 +25,7 @@ var testMixers = []struct {
 	{"HexLowerMixer", HexLowerMixer},
 	{"NumericMixer", NumericMixer},
 	{"SymbolsMixer", SymbolsMixer},
-	{"myDefineMixer", MustNewWith(salt, "0123456789ABCabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-_@!0123456789ABCEF~!@#$%^&*()_+,./\\{}<>[]|")},
+	{"myDefineMixer", NewWith(salt, "0123456789ABCabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-_@!0123456789ABCEF~!@#$%^&*()_+,./\\{}<>[]|")},
 }
 
 func TestMixer(t *testing.T) {

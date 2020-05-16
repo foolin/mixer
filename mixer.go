@@ -17,37 +17,37 @@ var (
 	StdMixer = AlphanumericCaseMixer
 
 	//AlphanumericCaseMixer the alphanumeric include upper and lower:`0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ`
-	AlphanumericCaseMixer = MustNewWith(defaultSalt, "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
+	AlphanumericCaseMixer = NewWith(defaultSalt, "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
 
 	//AlphanumericLowerMixer the alphanumeric include upper:`0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ`
-	AlphanumericUpperMixer = MustNewWith(defaultSalt, "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ")
+	AlphanumericUpperMixer = NewWith(defaultSalt, "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ")
 
 	//AlphanumericLowerMixer the alphanumeric include lower:`0123456789abcdefghijklmnopqrstuvwxyz`
-	AlphanumericLowerMixer = MustNewWith(defaultSalt, "0123456789abcdefghijklmnopqrstuvwxyz")
+	AlphanumericLowerMixer = NewWith(defaultSalt, "0123456789abcdefghijklmnopqrstuvwxyz")
 
 	//AlphabetCaseMixer the upper alphabet:`abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ`
-	AlphabetCaseMixer = MustNewWith(defaultSalt, "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
+	AlphabetCaseMixer = NewWith(defaultSalt, "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
 
 	//AlphabetUpperMixer the upper alphabet:`ABCDEFGHIJKLMNOPQRSTUVWXYZ`
-	AlphabetUpperMixer = MustNewWith(defaultSalt, "ABCDEFGHIJKLMNOPQRSTUVWXYZ")
+	AlphabetUpperMixer = NewWith(defaultSalt, "ABCDEFGHIJKLMNOPQRSTUVWXYZ")
 
 	//AlphabetLowerMixer the lower alphabet:`abcdefghijklmnopqrstuvwxyz`
-	AlphabetLowerMixer = MustNewWith(defaultSalt, "abcdefghijklmnopqrstuvwxyz")
+	AlphabetLowerMixer = NewWith(defaultSalt, "abcdefghijklmnopqrstuvwxyz")
 
 	//HexCaseMixer the hex alphabet and numeric:`0123456789abcdefABCDEF`
-	HexCaseMixer = MustNewWith(defaultSalt, "0123456789abcdefABCDEF")
+	HexCaseMixer = NewWith(defaultSalt, "0123456789abcdefABCDEF")
 
 	//HexLowerMixer the hex alphabet and numeric:`0123456789abcdef`
-	HexUpperMixer = MustNewWith(defaultSalt, "0123456789ABCDEF")
+	HexUpperMixer = NewWith(defaultSalt, "0123456789ABCDEF")
 
 	//HexLowerMixer the hex alphabet and numeric:`0123456789abcdef`
-	HexLowerMixer = MustNewWith(defaultSalt, "0123456789abcdef")
+	HexLowerMixer = NewWith(defaultSalt, "0123456789abcdef")
 
 	//NumericMixer the numeric:`0123456789abcdef`
-	NumericMixer = MustNewWith(defaultSalt, "0123456789")
+	NumericMixer = NewWith(defaultSalt, "0123456789")
 
 	//SymbolsMixer the symbols chars
-	SymbolsMixer = MustNewWith(defaultSalt, "0123456789ABCabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ~!@#$%^&*()_+-=.")
+	SymbolsMixer = NewWith(defaultSalt, "0123456789ABCabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ~!@#$%^&*()_+-=.")
 )
 
 var alphabetsRunes = []rune("abcdefghijklmnopqrstuvwxyz")
@@ -89,31 +89,17 @@ func NewWithConfig(cfg Config) (*Mixer, error) {
 	}, nil
 }
 
-//MustNewWithConfig must create a new mixer
-func MustNewWithConfig(cfg Config) *Mixer {
-	mixer, err := NewWithConfig(cfg)
-	if err != nil {
-		panic(err)
-	}
-	return mixer
-}
-
 //New create a new mixer with case sensitive alphanumeric
 func New() *Mixer {
 	return StdMixer
 }
 
 //NewWith create a new mixer with args
-func NewWith(salt string, mixChars string) (*Mixer, error) {
-	return NewWithConfig(Config{
+func NewWith(salt string, mixChars string) *Mixer {
+	mixer, err := NewWithConfig(Config{
 		Salt:     salt,
 		MixChars: mixChars,
 	})
-}
-
-//MustNewWith must create a new mixer
-func MustNewWith(salt string, mixChars string) *Mixer {
-	mixer, err := NewWith(salt, mixChars)
 	if err != nil {
 		panic(err)
 	}
@@ -124,7 +110,11 @@ func MustNewWith(salt string, mixChars string) *Mixer {
 func (m *Mixer) WithSalt(salt string) *Mixer {
 	cfg := m.config
 	cfg.Salt = salt
-	return MustNewWithConfig(cfg)
+	mix, err := NewWithConfig(cfg)
+	if err != nil {
+		panic(err)
+	}
+	return mix
 }
 
 //Encode encode char array
