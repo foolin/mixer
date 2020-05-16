@@ -8,7 +8,7 @@ import (
 )
 
 const (
-	//default salt for random seed: 202002022002
+	//DefaultSalt salt for random seed: 202002022002
 	DefaultSalt = "202002022002" //2020.02.02 20:02
 )
 
