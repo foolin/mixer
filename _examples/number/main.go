@@ -12,6 +12,7 @@ func main() {
 		123,
 		456,
 		123456,
+		1234567890,
 	}
 
 	mix := mixer.AlphanumericLowerMixer
