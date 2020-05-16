@@ -15,15 +15,17 @@ func main() {
 		1234567890,
 	}
 
-	mix := mixer.AlphanumericLowerMixer
+	//password
+	password := "1q2w3e"
 
 	//foreach every source
 	for _, source := range sources {
+
 		//Encode source data
-		encodeData := mix.EncodeNumber(source)
+		encodeData := mixer.EncodeNumber(password, source)
 
 		//Decode source data
-		decodeData := mix.DecodeNumber(encodeData)
+		decodeData := mixer.DecodeNumber(password, encodeData)
 
 		//Output result
 		fmt.Printf("-------\nsource: %v\nencode: %v\ndecode: %v\n-------\n",

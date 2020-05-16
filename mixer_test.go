@@ -12,8 +12,9 @@ var testMixers = []struct {
 	Name  string
 	Mixer *Mixer
 }{
-	{"StdMixer", StdMixer},
+	{"StdMixer", StdMixer.WithSalt(salt)},
 	{"AlphanumericCaseMixer", AlphanumericCaseMixer},
+	{"AlphanumericCaseMixerWithSalt", AlphanumericCaseMixer.WithSalt(salt)},
 	{"AlphanumericUpperMixer", AlphanumericUpperMixer},
 	{"AlphanumericLowerMixer", AlphanumericLowerMixer},
 	{"AlphabetCaseMixer", AlphabetCaseMixer},
@@ -50,8 +51,8 @@ func runTest(t *testing.T, isLog bool) {
 
 	for _, source := range sources {
 		for _, m := range testMixers {
-			encodeData := m.Mixer.EncodeString(source)
-			decodeData := m.Mixer.DecodeString(encodeData)
+			encodeData := m.Mixer.EncodeString(password, source)
+			decodeData := m.Mixer.DecodeString(password, encodeData)
 			if source != decodeData {
 				t.Fatalf("error: decode data not equal\n mixer: %v\nsource: %v\nencode: %v\ndecode: %v",
 					m.Name, source, encodeData, decodeData)
@@ -77,8 +78,8 @@ func TestNumber(t *testing.T) {
 	}
 	for _, source := range sources {
 		for _, m := range testMixers {
-			encodeData := m.Mixer.EncodeNumber(source)
-			decodeData := m.Mixer.DecodeNumber(encodeData)
+			encodeData := m.Mixer.EncodeNumber(password, source)
+			decodeData := m.Mixer.DecodeNumber(password, encodeData)
 			if source != decodeData {
 				t.Fatalf("error: decode data not equal\n mixer: %v\nsource: %v\nencode: %v\ndecode: %v",
 					m.Name, source, encodeData, decodeData)

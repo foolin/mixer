@@ -11,18 +11,19 @@ func main() {
 	sources := []string{
 		"123456",
 		"12345abcedf",
-		"48656c6c6f204d69786572",
+		"0123456789abcdefghijklmnopqrstuvwxyz",
 	}
 
-	mix := mixer.StdMixer
+	//password
+	password := "1q2w3e"
 
 	//foreach every source
 	for _, source := range sources {
 		//Encode source data
-		encodeData := mix.EncodeString(source)
+		encodeData := mixer.EncodeString(password, source)
 
 		//Decode source data
-		decodeData := mix.DecodeString(encodeData)
+		decodeData := mixer.DecodeString(password, encodeData)
 
 		//Output result
 		fmt.Printf("-------\nsource: %v\nencode: %v\ndecode: %v\n-------\n",

@@ -8,7 +8,7 @@ import (
 )
 
 const (
-	defaultSalt = "mIxODL^%&tz$AAW"
+	defaultSalt = "m1i0x2e4r"
 )
 
 var (
@@ -65,7 +65,7 @@ type Mixer struct {
 	mapDecodeChars map[rune]rune
 }
 
-//NewWithChars create a new mixer
+//NewWithConfig create a new mixer
 func NewWithConfig(cfg Config) (*Mixer, error) {
 	if cfg.Salt == "" {
 		return nil, fmt.Errorf("salt is not allow empty")
@@ -89,7 +89,7 @@ func NewWithConfig(cfg Config) (*Mixer, error) {
 	}, nil
 }
 
-//MustNewWithChars must create a new mixer
+//MustNewWithConfig must create a new mixer
 func MustNewWithConfig(cfg Config) *Mixer {
 	mixer, err := NewWithConfig(cfg)
 	if err != nil {
@@ -128,12 +128,7 @@ func (m *Mixer) WithSalt(salt string) *Mixer {
 }
 
 //Encode encode char array
-func (m Mixer) Encode(data []rune) []rune {
-	return m.Encodep("", data)
-}
-
-//Encodep encode char array
-func (m Mixer) Encodep(password string, data []rune) []rune {
+func (m Mixer) Encode(password string, data []rune) []rune {
 	seed := m.getSeed(password)
 	outChars := make([]rune, len(data))
 	for i, c := range data {
@@ -147,12 +142,7 @@ func (m Mixer) Encodep(password string, data []rune) []rune {
 }
 
 //Decode decode char array
-func (m Mixer) Decode(data []rune) []rune {
-	return m.Decodep("", data)
-}
-
-//Decodep decode char array
-func (m Mixer) Decodep(password string, data []rune) []rune {
+func (m Mixer) Decode(password string, data []rune) []rune {
 	seed := m.getSeed(password)
 	outChars := randomDecode(data, seed)
 	for i, c := range outChars {
@@ -165,39 +155,24 @@ func (m Mixer) Decodep(password string, data []rune) []rune {
 	return outChars
 }
 
-//EncodeInt64 encode string
-func (m Mixer) EncodeNumber(value int64) string {
-	return m.EncodeNumberp("", value)
+//EncodeNumber encode string
+func (m Mixer) EncodeNumber(password string, value int64) string {
+	return m.EncodeNumberPadding(password, value, 16)
 }
 
-//EncodeInt64p encode string
-func (m Mixer) EncodeNumberp(password string, value int64) string {
-	return m.EncodeNumberPaddingp(password, value, 16)
-}
-
-//EncodeInt64p encode string
-func (m Mixer) EncodeNumberPadding(value int64, paddingLen int) string {
-	return m.EncodeNumberPaddingp("", value, paddingLen)
-}
-
-//EncodeInt64p encode string
-func (m Mixer) EncodeNumberPaddingp(password string, value int64, paddingLen int) string {
+//EncodeNumberPadding encode string
+func (m Mixer) EncodeNumberPadding(password string, value int64, paddingLen int) string {
 	runes := []rune(strconv.FormatInt(value, 10))
 	numLen := len(runes)
 	if numLen < paddingLen {
 		runes = append(runes, randomAlphabets(paddingLen-numLen)...)
 	}
-	return string(m.Encodep(password, runes))
+	return string(m.Encode(password, runes))
 }
 
 //DecodeNumber decode string
-func (m Mixer) DecodeNumber(data string) int64 {
-	return m.DecodeNumberp("", data)
-}
-
-//DecodeNumberp decode string
-func (m Mixer) DecodeNumberp(password string, data string) int64 {
-	decodeRunes := m.Decodep(password, []rune(data))
+func (m Mixer) DecodeNumber(password string, data string) int64 {
+	decodeRunes := m.Decode(password, []rune(data))
 	numRunes := make([]rune, 0)
 	for _, r := range decodeRunes {
 		if r >= '0' && r <= '9' {
@@ -211,23 +186,13 @@ func (m Mixer) DecodeNumberp(password string, data string) int64 {
 }
 
 //EncodeString encode string
-func (m Mixer) EncodeString(data string) string {
-	return m.EncodeStringp("", data)
-}
-
-//EncodeStringp encode string
-func (m Mixer) EncodeStringp(password, data string) string {
-	return string(m.Encodep(password, []rune(data)))
+func (m Mixer) EncodeString(password, data string) string {
+	return string(m.Encode(password, []rune(data)))
 }
 
 //DecodeString decode string
-func (m Mixer) DecodeString(data string) string {
-	return m.DecodeStringp("", data)
-}
-
-//DecodeStringp decode string
-func (m Mixer) DecodeStringp(password, data string) string {
-	return string(m.Decodep(password, []rune(data)))
+func (m Mixer) DecodeString(password, data string) string {
+	return string(m.Decode(password, []rune(data)))
 }
 
 //Config return current Config
