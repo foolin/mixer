@@ -8,7 +8,8 @@ import (
 )
 
 const (
-	defaultSalt = "m1i0x2e4r"
+	//default salt for random seed: 202002022002
+	DefaultSalt = "202002022002" //2020.02.02 20:02
 )
 
 var (
@@ -17,37 +18,37 @@ var (
 	StdMixer = AlphanumericCaseMixer
 
 	//AlphanumericCaseMixer the alphanumeric include upper and lower:`0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ`
-	AlphanumericCaseMixer = NewWith(defaultSalt, "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
+	AlphanumericCaseMixer = NewWith(DefaultSalt, "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
 
 	//AlphanumericUpperMixer the alphanumeric include upper:`0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ`
-	AlphanumericUpperMixer = NewWith(defaultSalt, "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ")
+	AlphanumericUpperMixer = NewWith(DefaultSalt, "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ")
 
 	//AlphanumericLowerMixer the alphanumeric include lower:`0123456789abcdefghijklmnopqrstuvwxyz`
-	AlphanumericLowerMixer = NewWith(defaultSalt, "0123456789abcdefghijklmnopqrstuvwxyz")
+	AlphanumericLowerMixer = NewWith(DefaultSalt, "0123456789abcdefghijklmnopqrstuvwxyz")
 
 	//AlphabetCaseMixer the upper alphabet:`abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ`
-	AlphabetCaseMixer = NewWith(defaultSalt, "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
+	AlphabetCaseMixer = NewWith(DefaultSalt, "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
 
 	//AlphabetUpperMixer the upper alphabet:`ABCDEFGHIJKLMNOPQRSTUVWXYZ`
-	AlphabetUpperMixer = NewWith(defaultSalt, "ABCDEFGHIJKLMNOPQRSTUVWXYZ")
+	AlphabetUpperMixer = NewWith(DefaultSalt, "ABCDEFGHIJKLMNOPQRSTUVWXYZ")
 
 	//AlphabetLowerMixer the lower alphabet:`abcdefghijklmnopqrstuvwxyz`
-	AlphabetLowerMixer = NewWith(defaultSalt, "abcdefghijklmnopqrstuvwxyz")
+	AlphabetLowerMixer = NewWith(DefaultSalt, "abcdefghijklmnopqrstuvwxyz")
 
 	//HexCaseMixer the hex alphabet and numeric:`0123456789abcdefABCDEF`
-	HexCaseMixer = NewWith(defaultSalt, "0123456789abcdefABCDEF")
+	HexCaseMixer = NewWith(DefaultSalt, "0123456789abcdefABCDEF")
 
 	//HexUpperMixer the hex alphabet and numeric:`0123456789abcdef`
-	HexUpperMixer = NewWith(defaultSalt, "0123456789ABCDEF")
+	HexUpperMixer = NewWith(DefaultSalt, "0123456789ABCDEF")
 
 	//HexLowerMixer the hex alphabet and numeric:`0123456789abcdef`
-	HexLowerMixer = NewWith(defaultSalt, "0123456789abcdef")
+	HexLowerMixer = NewWith(DefaultSalt, "0123456789abcdef")
 
 	//NumericMixer the numeric:`0123456789abcdef`
-	NumericMixer = NewWith(defaultSalt, "0123456789")
+	NumericMixer = NewWith(DefaultSalt, "0123456789")
 
 	//SymbolsMixer the symbols chars
-	SymbolsMixer = NewWith(defaultSalt, "0123456789ABCabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ~!@#$%^&*()_+-=.")
+	SymbolsMixer = NewWith(DefaultSalt, "0123456789ABCabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ~!@#$%^&*()_+-=.")
 )
 
 var alphabetsRunes = []rune("abcdefghijklmnopqrstuvwxyz")
