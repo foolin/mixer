@@ -13,13 +13,13 @@ const (
 
 var (
 
-	//StdMixer
+	//StdMixer std mixer is alias AlphanumericCaseMixer
 	StdMixer = AlphanumericCaseMixer
 
 	//AlphanumericCaseMixer the alphanumeric include upper and lower:`0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ`
 	AlphanumericCaseMixer = NewWith(defaultSalt, "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
 
-	//AlphanumericLowerMixer the alphanumeric include upper:`0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ`
+	//AlphanumericUpperMixer the alphanumeric include upper:`0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ`
 	AlphanumericUpperMixer = NewWith(defaultSalt, "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ")
 
 	//AlphanumericLowerMixer the alphanumeric include lower:`0123456789abcdefghijklmnopqrstuvwxyz`
@@ -37,7 +37,7 @@ var (
 	//HexCaseMixer the hex alphabet and numeric:`0123456789abcdefABCDEF`
 	HexCaseMixer = NewWith(defaultSalt, "0123456789abcdefABCDEF")
 
-	//HexLowerMixer the hex alphabet and numeric:`0123456789abcdef`
+	//HexUpperMixer the hex alphabet and numeric:`0123456789abcdef`
 	HexUpperMixer = NewWith(defaultSalt, "0123456789ABCDEF")
 
 	//HexLowerMixer the hex alphabet and numeric:`0123456789abcdef`
@@ -52,6 +52,7 @@ var (
 
 var alphabetsRunes = []rune("abcdefghijklmnopqrstuvwxyz")
 
+//Config configuration for new mixer
 type Config struct {
 	Salt     string //salt for random seed
 	MixChars string //chars for mix
