@@ -6,21 +6,25 @@ import (
 	"time"
 )
 
-var alphanumericAndUpperMixer = New(salt)
-var myCharsChars, _ = NewWithChars(salt, "0123456789ABCabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-_@!", "0123456789ABCEF&^%")
 var salt = "123456"
+var password = "1q2w3e4r"
 var testMixers = []struct {
 	Name  string
 	Mixer *Mixer
 }{
-	{"AlphanumericCase", Newt(salt, AlphanumericCase)},
-	{"AlphanumericUpper", Newt(salt, AlphanumericUpper)},
-	{"AlphanumericLower", Newt(salt, AlphanumericLower)},
-	{"HexUpper", MustNewWithChars(salt, CharsUpperHex)},
-	{"HexLower", MustNewWithChars(salt, CharsLowerHex)},
-	{"Numeric", New(salt)},
-	{"alphanumericAndUpperMixer", alphanumericAndUpperMixer},
-	{"myCharsChars", myCharsChars},
+	{"StdMixer", StdMixer},
+	{"AlphanumericCaseMixer", AlphanumericCaseMixer},
+	{"AlphanumericUpperMixer", AlphanumericUpperMixer},
+	{"AlphanumericLowerMixer", AlphanumericLowerMixer},
+	{"AlphabetCaseMixer", AlphabetCaseMixer},
+	{"AlphabetUpperMixer", AlphabetUpperMixer},
+	{"AlphabetLowerMixer", AlphabetLowerMixer},
+	{"HexCaseMixer", HexCaseMixer},
+	{"HexUpperMixer", HexUpperMixer},
+	{"HexLowerMixer", HexLowerMixer},
+	{"NumericMixer", NumericMixer},
+	{"SymbolsMixer", SymbolsMixer},
+	{"myDefineMixer", MustNewWith(salt, "0123456789ABCabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-_@!0123456789ABCEF~!@#$%^&*()_+,./\\{}<>[]|")},
 }
 
 func TestMixer(t *testing.T) {
@@ -41,6 +45,7 @@ func runTest(t *testing.T, isLog bool) {
 		"abc4d3f69575dd4123",
 		"68656c6c6f20776f726c6421",
 		"46653FD803893E4F75696240258265D2",
+		"^%&tz$",
 	}
 
 	for _, source := range sources {
@@ -62,7 +67,7 @@ func TestHex(t *testing.T) {
 	t.Logf("%v", hex.EncodeToString([]byte("Hello Mixer")))
 }
 
-func TestMixer_EncodeInt64(t *testing.T) {
+func TestNumber(t *testing.T) {
 	sources := []int64{
 		1,
 		12,
@@ -72,11 +77,8 @@ func TestMixer_EncodeInt64(t *testing.T) {
 	}
 	for _, source := range sources {
 		for _, m := range testMixers {
-			encodeData := m.Mixer.EncodeInt64(source)
-			decodeData, err := m.Mixer.DecodeInt64(encodeData)
-			if err != nil {
-				t.Fatalf("error: %v", err)
-			}
+			encodeData := m.Mixer.EncodeNumber(source)
+			decodeData := m.Mixer.DecodeNumber(encodeData)
 			if source != decodeData {
 				t.Fatalf("error: decode data not equal\n mixer: %v\nsource: %v\nencode: %v\ndecode: %v",
 					m.Name, source, encodeData, decodeData)

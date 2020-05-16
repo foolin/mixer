@@ -1,86 +1,97 @@
 package mixer
 
 import (
-	"errors"
 	"fmt"
+	"math/rand"
 	"strconv"
+	"sync"
 )
 
 const (
-	//CharsCaseAlphanumeric the alphanumeric include upper and lower:`0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ`
-	CharsCaseAlphanumeric = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
-
-	//CharsUpperAlphanumeric the alphanumeric include upper:`0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ`
-	CharsUpperAlphanumeric = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-
-	//CharsLowerAlphanumeric the alphanumeric include lower:`0123456789abcdefghijklmnopqrstuvwxyz`
-	CharsLowerAlphanumeric = "0123456789abcdefghijklmnopqrstuvwxyz"
-
-	//CharsUpperAlphabet the upper alphabet:`ABCDEFGHIJKLMNOPQRSTUVWXYZ`
-	CharsUpperAlphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-
-	//CharsLowerAlphabet the lower alphabet:`abcdefghijklmnopqrstuvwxyz`
-	CharsLowerAlphabet = "abcdefghijklmnopqrstuvwxyz"
-
-	//CharsUpperHex the hex alphabet and numeric:`0123456789abcdef`
-	CharsUpperHex = "0123456789ABCDEF"
-
-	//CharsLowerHex the hex alphabet and numeric:`0123456789abcdef`
-	CharsLowerHex = "0123456789abcdef"
-
-	//CharsNumeric the numeric:`0123456789abcdef`
-	CharsNumeric = "0123456789"
+	defaultSalt = "mIxODL^%&tz$AAW"
 )
 
-//AlphanumericType alphanumeric type
-type AlphanumericType int
+var (
 
-const (
-	//AlphanumericCase AlphanumericType is CharsCaseAlphanumeric
-	AlphanumericCase AlphanumericType = iota
+	//StdMixer
+	StdMixer = AlphanumericCaseMixer
 
-	//AlphanumericUpper AlphanumericType is CharsUpperAlphanumeric
-	AlphanumericUpper
+	//AlphanumericCaseMixer the alphanumeric include upper and lower:`0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ`
+	AlphanumericCaseMixer = MustNewWith(defaultSalt, "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
 
-	//AlphanumericLower AlphanumericType is CharsLowerAlphanumeric
-	AlphanumericLower
+	//AlphanumericLowerMixer the alphanumeric include upper:`0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ`
+	AlphanumericUpperMixer = MustNewWith(defaultSalt, "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ")
+
+	//AlphanumericLowerMixer the alphanumeric include lower:`0123456789abcdefghijklmnopqrstuvwxyz`
+	AlphanumericLowerMixer = MustNewWith(defaultSalt, "0123456789abcdefghijklmnopqrstuvwxyz")
+
+	//AlphabetCaseMixer the upper alphabet:`abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ`
+	AlphabetCaseMixer = MustNewWith(defaultSalt, "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
+
+	//AlphabetUpperMixer the upper alphabet:`ABCDEFGHIJKLMNOPQRSTUVWXYZ`
+	AlphabetUpperMixer = MustNewWith(defaultSalt, "ABCDEFGHIJKLMNOPQRSTUVWXYZ")
+
+	//AlphabetLowerMixer the lower alphabet:`abcdefghijklmnopqrstuvwxyz`
+	AlphabetLowerMixer = MustNewWith(defaultSalt, "abcdefghijklmnopqrstuvwxyz")
+
+	//HexCaseMixer the hex alphabet and numeric:`0123456789abcdefABCDEF`
+	HexCaseMixer = MustNewWith(defaultSalt, "0123456789abcdefABCDEF")
+
+	//HexLowerMixer the hex alphabet and numeric:`0123456789abcdef`
+	HexUpperMixer = MustNewWith(defaultSalt, "0123456789ABCDEF")
+
+	//HexLowerMixer the hex alphabet and numeric:`0123456789abcdef`
+	HexLowerMixer = MustNewWith(defaultSalt, "0123456789abcdef")
+
+	//NumericMixer the numeric:`0123456789abcdef`
+	NumericMixer = MustNewWith(defaultSalt, "0123456789")
+
+	//SymbolsMixer the symbols chars
+	SymbolsMixer = MustNewWith(defaultSalt, "0123456789ABCabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ~!@#$%^&*()_+-=.")
 )
+
+var alphabetsRunes = []rune("abcdefghijklmnopqrstuvwxyz")
+
+type Config struct {
+	Salt     string //salt for random seed
+	MixChars string //chars for mix
+}
 
 //Mixer a mixer instance for encode/decode
 type Mixer struct {
-	saltSeed       int64
+	config         Config
+	cacheSaltSeeds sync.Map //cache salt seed
 	mapEncodeChars map[rune]rune
 	mapDecodeChars map[rune]rune
 }
 
 //NewWithChars create a new mixer
-func NewWithChars(salt string, chars string, candidateChars ...string) (*Mixer, error) {
-	if chars == "" {
-		return nil, errors.New("at least one of `dictChars` parameters is required")
+func NewWithConfig(cfg Config) (*Mixer, error) {
+	if cfg.Salt == "" {
+		return nil, fmt.Errorf("salt is not allow empty")
 	}
-	seed := sumSaltSeed(salt)
-	mapEncodeTable := make(map[rune]rune, 0)
-	mapEncodeTable = appendChars(mapEncodeTable, chars, seed)
-	for _, v := range candidateChars {
-		mapEncodeTable = appendChars(mapEncodeTable, v, seed)
-	}
+	seed := sumSaltSeed(cfg.Salt)
+	var cacheSaltSeeds sync.Map
+	cacheSaltSeeds.Store(cfg.Salt, seed)
+	mapEncodeTable := createMapChars(cfg.MixChars, seed)
 	if len(mapEncodeTable) < 2 {
-		return nil, fmt.Errorf("dict chars `%v` is not invalid", chars)
+		return nil, fmt.Errorf("mixChars `%v` is not invalid", cfg.MixChars)
 	}
 	mapDecodeTable := make(map[rune]rune, 0)
 	for k, v := range mapEncodeTable {
 		mapDecodeTable[v] = k
 	}
 	return &Mixer{
-		saltSeed:       seed,
+		config:         cfg,
+		cacheSaltSeeds: cacheSaltSeeds,
 		mapEncodeChars: mapEncodeTable,
 		mapDecodeChars: mapDecodeTable,
 	}, nil
 }
 
 //MustNewWithChars must create a new mixer
-func MustNewWithChars(salt string, chars string, candidateChars ...string) *Mixer {
-	mixer, err := NewWithChars(salt, chars, candidateChars...)
+func MustNewWithConfig(cfg Config) *Mixer {
+	mixer, err := NewWithConfig(cfg)
 	if err != nil {
 		panic(err)
 	}
@@ -88,25 +99,42 @@ func MustNewWithChars(salt string, chars string, candidateChars ...string) *Mixe
 }
 
 //New create a new mixer with case sensitive alphanumeric
-func New(salt string) *Mixer {
-	return Newt(salt, AlphanumericCase)
+func New() *Mixer {
+	return StdMixer
 }
 
-//Newt create a new mixer with alphanumeric and AlphanumericType
-func Newt(salt string, alphanumericType AlphanumericType) *Mixer {
-	switch alphanumericType {
-	case AlphanumericUpper:
-		return MustNewWithChars(salt, CharsUpperAlphanumeric)
-	case AlphanumericLower:
-		return MustNewWithChars(salt, CharsLowerAlphanumeric)
-	case AlphanumericCase:
-		return MustNewWithChars(salt, CharsCaseAlphanumeric)
+//NewWith create a new mixer with args
+func NewWith(salt string, mixChars string) (*Mixer, error) {
+	return NewWithConfig(Config{
+		Salt:     salt,
+		MixChars: mixChars,
+	})
+}
+
+//MustNewWith must create a new mixer
+func MustNewWith(salt string, mixChars string) *Mixer {
+	mixer, err := NewWith(salt, mixChars)
+	if err != nil {
+		panic(err)
 	}
-	return MustNewWithChars(salt, CharsCaseAlphanumeric)
+	return mixer
+}
+
+//WithSalt create copy Mixer with new salt
+func (m *Mixer) WithSalt(salt string) *Mixer {
+	cfg := m.config
+	cfg.Salt = salt
+	return MustNewWithConfig(cfg)
 }
 
 //Encode encode char array
 func (m Mixer) Encode(data []rune) []rune {
+	return m.Encodep("", data)
+}
+
+//Encodep encode char array
+func (m Mixer) Encodep(password string, data []rune) []rune {
+	seed := m.getSeed(password)
 	outChars := make([]rune, len(data))
 	for i, c := range data {
 		if v, ok := m.mapEncodeChars[c]; ok {
@@ -115,12 +143,18 @@ func (m Mixer) Encode(data []rune) []rune {
 			outChars[i] = c
 		}
 	}
-	return randomEncode(outChars, m.saltSeed)
+	return randomEncode(outChars, seed)
 }
 
 //Decode decode char array
 func (m Mixer) Decode(data []rune) []rune {
-	outChars := randomDecode(data, m.saltSeed)
+	return m.Decodep("", data)
+}
+
+//Decodep decode char array
+func (m Mixer) Decodep(password string, data []rune) []rune {
+	seed := m.getSeed(password)
+	outChars := randomDecode(data, seed)
 	for i, c := range outChars {
 		if rc, ok := m.mapDecodeChars[c]; ok {
 			outChars[i] = rc
@@ -131,29 +165,87 @@ func (m Mixer) Decode(data []rune) []rune {
 	return outChars
 }
 
-//EncodeString encode string
-func (m Mixer) EncodeInt64(value int64) string {
-	return m.EncodeString(fmt.Sprintf("%v", value*m.saltSeed))
+//EncodeInt64 encode string
+func (m Mixer) EncodeNumber(value int64) string {
+	return m.EncodeNumberp("", value)
 }
 
-//DecodeString decode string
-func (m Mixer) DecodeInt64(data string) (int64, error) {
-	deStr := m.DecodeString(data)
-	val, err := strconv.ParseInt(deStr, 10, 64)
-	if err != nil {
-		return 0, err
+//EncodeInt64p encode string
+func (m Mixer) EncodeNumberp(password string, value int64) string {
+	return m.EncodeNumberPaddingp(password, value, 16)
+}
+
+//EncodeInt64p encode string
+func (m Mixer) EncodeNumberPadding(value int64, paddingLen int) string {
+	return m.EncodeNumberPaddingp("", value, paddingLen)
+}
+
+//EncodeInt64p encode string
+func (m Mixer) EncodeNumberPaddingp(password string, value int64, paddingLen int) string {
+	runes := []rune(strconv.FormatInt(value, 10))
+	numLen := len(runes)
+	if numLen < paddingLen {
+		runes = append(runes, randomAlphabets(paddingLen-numLen)...)
 	}
-	return val / m.saltSeed, nil
+	return string(m.Encodep(password, runes))
+}
+
+//DecodeNumber decode string
+func (m Mixer) DecodeNumber(data string) int64 {
+	return m.DecodeNumberp("", data)
+}
+
+//DecodeNumberp decode string
+func (m Mixer) DecodeNumberp(password string, data string) int64 {
+	decodeRunes := m.Decodep(password, []rune(data))
+	numRunes := make([]rune, 0)
+	for _, r := range decodeRunes {
+		if r >= '0' && r <= '9' {
+			numRunes = append(numRunes, r)
+		} else {
+			break
+		}
+	}
+	val, _ := strconv.ParseInt(string(numRunes), 10, 64)
+	return val
 }
 
 //EncodeString encode string
 func (m Mixer) EncodeString(data string) string {
-	return string(m.Encode([]rune(data)))
+	return m.EncodeStringp("", data)
+}
+
+//EncodeStringp encode string
+func (m Mixer) EncodeStringp(password, data string) string {
+	return string(m.Encodep(password, []rune(data)))
 }
 
 //DecodeString decode string
 func (m Mixer) DecodeString(data string) string {
-	return string(m.Decode([]rune(data)))
+	return m.DecodeStringp("", data)
+}
+
+//DecodeStringp decode string
+func (m Mixer) DecodeStringp(password, data string) string {
+	return string(m.Decodep(password, []rune(data)))
+}
+
+//Config return current Config
+func (m Mixer) Config() Config {
+	return m.config
+}
+
+func (m Mixer) getSeed(password string) int64 {
+	if password == "" {
+		password = m.config.Salt
+	}
+	seed, ok := m.cacheSaltSeeds.Load(password)
+	if ok {
+		return seed.(int64)
+	}
+	saltSeed := sumSaltSeed(password)
+	m.cacheSaltSeeds.Store(password, saltSeed)
+	return saltSeed
 }
 
 func uniqueChars(chars string) []rune {
@@ -174,12 +266,10 @@ func uniqueChars(chars string) []rune {
 	return list
 }
 
-func appendChars(dictMaps map[rune]rune, chars string, seed int64) map[rune]rune {
+func createMapChars(chars string, seed int64) map[rune]rune {
 	dictChars := uniqueChars(chars)
 	rnChars := randomEncode(dictChars, seed)
-	if dictMaps == nil {
-		dictMaps = make(map[rune]rune, 0)
-	}
+	dictMaps := make(map[rune]rune, 0)
 	for i := 0; i < len(dictChars); i++ {
 		key := dictChars[i]
 		val := rnChars[i]
@@ -220,4 +310,13 @@ func sumSaltSeed(str string) int64 {
 		sum += int64(v)
 	}
 	return sum
+}
+
+func randomAlphabets(n int) []rune {
+	chars := make([]rune, n)
+	size := len(alphabetsRunes)
+	for i := 0; i < n; i++ {
+		chars[i] = alphabetsRunes[rand.Intn(size)]
+	}
+	return chars
 }
