@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/foolin/mixer"
+	"time"
 )
 
 func main() {
@@ -13,6 +14,7 @@ func main() {
 		456,
 		123456,
 		1234567890,
+		time.Now().UnixNano(),
 	}
 
 	//password

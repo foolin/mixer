@@ -14,7 +14,7 @@ Mixer is a very simple encrypt and decrypt golang library for short strings such
 * **Simple** - The encryption algorithm works by replacing and mixing characters.
 * **Custom** Support for custom replacement characters.
 * **LCG algorithm** Use Linear Congruential Generator (LCG) algorithm to generate pseudorandom numbers.
-
+* **ID Number Padding** Support number padding for ID number(default is padding 16 characters)
 
 ## Install
 
@@ -42,89 +42,68 @@ package main
 import (
 	"fmt"
 	"github.com/foolin/mixer"
+	"time"
 )
 
 func main() {
 
-	//password
-	salt := "a1b2c3d4"
-
 	//the source to be encrypted
-	sources := []string{
-		"123456",
-		"12345abcedf",
-		"48656c6c6f204d69786572",
+	sources := []int64{
+		123,
+		456,
+		123456,
+		1234567890,
+		time.Now().UnixNano(),
 	}
 
-	mixers := []struct {
-		Name  string
-		Mixer *mixer.Mixer
-	}{
-		//create a new mixer with case sensitive alphanumeric
-		{"New(salt)", mixer.New(salt)},
-
-		//create a new mixer with lowercase  alphanumeric
-		{"Newt(salt, AlphanumericLower)", mixer.Newt(salt, mixer.AlphanumericLower)},
-	}
+	//password
+	password := "1q2w3e"
 
 	//foreach every source
 	for _, source := range sources {
-		//foreach mixer for encode and decode
-		for _, m := range mixers {
-			//Encode source data
-			encodeData := m.Mixer.EncodeString(source)
 
-			//Decode source data
-			decodeData := m.Mixer.DecodeString(encodeData)
+		//Encode source data, default padding 16 characters
+		encodeData := mixer.EncodeNumber(password, source)
 
-			//Output result
-			fmt.Printf("-------\n mixer: %v\nsource: %v\nencode: %v\ndecode: %v\n-------\n",
-				m.Name, source, encodeData, decodeData)
-		}
+		//Decode source data
+		decodeData := mixer.DecodeNumber(password, encodeData)
+
+		//Output result
+		fmt.Printf("-------\nsource: %v\nencode: %v\ndecode: %v\n-------\n",
+			source, encodeData, decodeData)
 	}
 
 }
-
 
 ```
 
 Run output:
 ```
+
 -------
- mixer: New(salt)
+source: 123
+encode: 5kc8y0x8qwtr59ug
+decode: 123
+-------
+-------
+source: 456
+encode: zp2niz2rn5gmnr7l
+decode: 456
+-------
+-------
 source: 123456
-encode: W51Y9U
+encode: hkigy6pv3axvj5u7
 decode: 123456
 -------
 -------
- mixer: Newt(salt, AlphanumericLower)
-source: 123456
-encode: 05139e
-decode: 123456
+source: 1234567890
+encode: lkidy1pberg8svu7
+decode: 1234567890
 -------
 -------
- mixer: New(salt)
-source: 12345abcedf
-encode: J51YZMDUtWS
-decode: 12345abcedf
--------
--------
- mixer: Newt(salt, AlphanumericLower)
-source: 12345abcedf
-encode: r513spoet0n
-decode: 12345abcedf
--------
--------
- mixer: New(salt)
-source: 48656c6c6f204d69786572
-encode: 9Ub5M9Slm19q9bq9DU15M9
-decode: 48656c6c6f204d69786572
--------
--------
- mixer: Newt(salt, AlphanumericLower)
-source: 48656c6c6f204d69786572
-encode: 9eb5p9nlm19q9bq9oe15p9
-decode: 48656c6c6f204d69786572
+source: 1589642163813684200
+encode: 11pbiubkpp1k7uuye7y
+decode: 1589642163813684200
 -------
 
 ```
