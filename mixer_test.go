@@ -68,6 +68,10 @@ func TestHex(t *testing.T) {
 	t.Logf("%v", hex.EncodeToString([]byte("Hello Mixer")))
 }
 
+func TestMixer_Config(t *testing.T) {
+	t.Logf("%#v", StdMixer.Config())
+}
+
 func TestNumber(t *testing.T) {
 	sources := []int64{
 		1,
