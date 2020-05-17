@@ -133,3 +133,13 @@ func TestRandomize(t *testing.T) {
 	}
 
 }
+
+func TestEncodeEmptyPassowrd(t *testing.T) {
+	mix := New()
+	source := "0123456789abcdefgHIJKLMN"
+	encode := mix.EncodeString("", source)
+	decode := mix.DecodeString("", encode)
+
+	t.Logf("\n------------\nsource: %v\nencode: %v\ndecode: %v\n------------\n",
+		source, encode, decode)
+}
