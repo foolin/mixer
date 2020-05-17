@@ -212,10 +212,11 @@ decode: 51f5df9e0e802ed54465638ba31158c2
 
 # Todos
 
-- Other languages Implementations
-[ ] Java
-[ ] PHP
-[ ] Javascript
+###  Other languages Implementations
+
+- [ ] Java Implementation
+- [ ] PHP Implementation
+- [ ] Javascript Implementation
 
 [go-doc]: https://pkg.go.dev/github.com/foolin/mixer
 [go-doc-img]: https://godoc.org/github.com/foolin/mixer?status.svg
