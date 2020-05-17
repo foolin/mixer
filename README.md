@@ -30,10 +30,31 @@ The {version} release list: <https://github.com/foolin/mixer/releases>
 
 # Docs
 
-See [Mixer](https://pkg.go.dev/github.com/foolin/mixer)
+
+```golang
+
+//EncodeString encode string use global default mixer
+func EncodeString(password string, data string) string
+
+//DecodeString encode global default mixer
+func DecodeString(password string, data string) string
+
+//EncodeNumber encode global default mixer
+func EncodeNumber(password string, value int64) string
+
+//EncodeNumberPadding  encode padding default number mixer
+func EncodeNumberPadding(password string, value int64, paddingLen int) string
+
+//DecodeNumber decode default number mixer
+func DecodeNumber(password string, data string) int64
+
+```
+
+See [Mixer Godoc](https://pkg.go.dev/github.com/foolin/mixer)
 
 # Usage
 
+- Number(ID) Example:
 
 ```golang
 
@@ -50,9 +71,9 @@ func main() {
 	//the source to be encrypted
 	sources := []int64{
 		123,
-		456,
 		123456,
 		1234567890,
+		999999999,
 		time.Now().UnixNano(),
 	}
 
@@ -62,15 +83,21 @@ func main() {
 	//foreach every source
 	for _, source := range sources {
 
-		//Encode source data, default padding 16 characters
+		//Encode source data
 		encodeData := mixer.EncodeNumber(password, source)
 
 		//Decode source data
 		decodeData := mixer.DecodeNumber(password, encodeData)
 
+		//Encode source data with padding 20
+		encodePaddingData := mixer.EncodeNumberPadding(password, source, 20)
+
+		//Decode source padding data
+		decodePaddingData := mixer.DecodeNumber(password, encodeData)
+
 		//Output result
-		fmt.Printf("-------\nsource: %v\nencode: %v\ndecode: %v\n-------\n",
-			source, encodeData, decodeData)
+		fmt.Printf("-------\nsource: %v\nencode: %v\ndecode: %v\nencodePadding(20): %v\ndecodePadding(20): %v\n-------\n",
+			source, encodeData, decodeData, encodePaddingData, decodePaddingData)
 	}
 
 }
@@ -79,34 +106,116 @@ func main() {
 
 Run output:
 ```
-
 -------
 source: 123
-encode: 5kc8y0x8qwtr59ug
+encode: 0kanys350waz3juw
 decode: 123
--------
--------
-source: 456
-encode: zp2niz2rn5gmnr7l
-decode: 456
+encodePadding(20): 0ka8yss50waz3oulw3nj
+decodePadding(20): 123
 -------
 -------
 source: 123456
-encode: hkigy6pv3axvj5u7
+encode: skiwyapn30j5z0u7
 decode: 123456
+encodePadding(20): ski3yaan30j5zluw7pw0
+decodePadding(20): 123456
 -------
 -------
 source: 1234567890
-encode: lkidy1pberg8svu7
+encode: wkidy1pbens30au7
 decode: 1234567890
+encodePadding(20): wkijy10bens30zu57pda
+decodePadding(20): 1234567890
 -------
 -------
-source: 1589642163813684200
-encode: 11pbiubkpp1k7uuye7y
-decode: 1589642163813684200
+source: 999999999
+encode: aeeeeeewes0n53ee
+decode: 999999999
+encodePadding(20): aeezeejwes0n5we0eee3
+decodePadding(20): 999999999
+-------
+-------
+source: 1589704043390707700
+encode: k1dbibbk7dbbdeudeb7
+decode: 1589704043390707700
+encodePadding(20): k1dbibbk7dbbdwudeb7e
+decodePadding(20): 1589704043390707700
+-------
+
+
+```
+
+- String(Hash) Example:
+
+
+```golang
+
+package main
+
+import (
+	"crypto/md5"
+	"fmt"
+	"github.com/foolin/mixer"
+)
+
+func main() {
+
+	//the source to be encrypted
+	sources := []string{
+		"abc012345edf",
+		"0123456789abcdefghijklmnopqrstuvwxyz",
+		fmt.Sprintf("%x", md5.Sum([]byte("Hello Mixer"))),
+	}
+
+	//password
+	password := "1q2w3e"
+
+	//foreach every source
+	for _, source := range sources {
+		//Encode source data
+		encodeData := mixer.EncodeString(password, source)
+
+		//Decode source data
+		decodeData := mixer.DecodeString(password, encodeData)
+
+		//Output result
+		fmt.Printf("-------\nsource: %v\nencode: %v\ndecode: %v\n-------\n",
+			source, encodeData, decodeData)
+	}
+
+}
+
+
+```
+
+Run output:
+```
+
+-------
+source: abc012345edf
+encode: hruC87FfRv5N
+decode: abc012345edf
+-------
+-------
+source: 0123456789abcdefghijklmnopqrstuvwxyz
+encode: 5B6oSK3Q1wfrvHNqjRp87LhlucJ0Xn2CFaIt
+decode: 0123456789abcdefghijklmnopqrstuvwxyz
+-------
+-------
+source: 51f5df9e0e802ed54465638ba31158c2
+encode: 1rppCfufN1hFR8R7RvQNh5fRuF1uC7vR
+decode: 51f5df9e0e802ed54465638ba31158c2
 -------
 
 ```
+
+
+# Todos
+
+- Other languages Implementations
+[ ] Java
+[ ] PHP
+[ ] Javascript
 
 [go-doc]: https://pkg.go.dev/github.com/foolin/mixer
 [go-doc-img]: https://godoc.org/github.com/foolin/mixer?status.svg
