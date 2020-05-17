@@ -34,7 +34,7 @@ See [Mixer Godoc](https://pkg.go.dev/github.com/foolin/mixer)
 
 # Usage
 
-- ID Example:
+- ID(uint64) Example:
 
 ```golang
 
@@ -146,7 +146,7 @@ decodePadding(20): 18446744073709551615
 
 ```
 
-- String(Hash) Example:
+- String Example:
 
 
 ```golang
