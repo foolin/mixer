@@ -2,7 +2,6 @@ package mixer
 
 import (
 	"fmt"
-	"math/rand"
 	"strconv"
 	"sync"
 )
@@ -157,7 +156,8 @@ func (m Mixer) EncodeNumberPadding(password string, value int64, paddingLen int)
 	runes := []rune(strconv.FormatInt(value, 10))
 	numLen := len(runes)
 	if numLen < paddingLen {
-		runes = append(runes, randomAlphabets(paddingLen-numLen)...)
+		seed := m.getSeed(password)
+		runes = append(runes, randomAlphabets(paddingLen-numLen, seed)...)
 	}
 	return string(m.Encode(password, runes))
 }
@@ -269,11 +269,12 @@ func sumSaltSeed(str string) int64 {
 	return sum
 }
 
-func randomAlphabets(n int) []rune {
+func randomAlphabets(n int, seed int64) []rune {
 	chars := make([]rune, n)
 	size := len(alphabetsRunes)
+	rn := NewLGC(seed)
 	for i := 0; i < n; i++ {
-		chars[i] = alphabetsRunes[rand.Intn(size)]
+		chars[i] = alphabetsRunes[rn.Intn(size)]
 	}
 	return chars
 }
