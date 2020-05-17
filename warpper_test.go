@@ -40,6 +40,24 @@ func TestEncodeID(t *testing.T) {
 
 }
 
+func TestEncodeBase32(t *testing.T) {
+	source := "!@#$%^&*()〇"
+	encode := EncodeBase32(testWrapperPassword, source)
+	decode, err := DecodeBase32(testWrapperPassword, encode)
+	if err != nil {
+		t.Fatal(err)
+	}
+	encodePadding := EncodeBase32Padding(testWrapperPassword, source, 64)
+	decodePadding, err := DecodeBase32(testWrapperPassword, encodePadding)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	t.Logf("\n------------\nsource: %v\nencode: %v\ndecode: %v\nencodePadding: %v\ndecodePadding: %v\n------------\n",
+		source, encode, decode, encodePadding, decodePadding)
+
+}
+
 func TestEncodeString(t *testing.T) {
 	source := "0123456789abcdefgHIJKLMN"
 	encode := EncodeString(testWrapperPassword, source)
