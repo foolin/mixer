@@ -9,8 +9,9 @@ import (
 
 const (
 	//DefaultSalt salt for random seed: 202002022002
-	DefaultSalt          = "202002022002" //2020.02.02 20:02
-	DefaultNumberPadding = 16
+	DefaultSalt = "202002022002" //2020.02.02 20:02
+	//DefaultPaddingLength default padding length
+	DefaultPaddingLength = 16
 )
 
 var (
@@ -151,7 +152,7 @@ func (m Mixer) Decode(password string, data []rune) []rune {
 
 //EncodeNumber encode int64 number
 func (m Mixer) EncodeNumber(password string, value int64) string {
-	return m.EncodeNumberPadding(password, value, DefaultNumberPadding)
+	return m.EncodeNumberPadding(password, value, DefaultPaddingLength)
 }
 
 //EncodeNumberPadding encode int64 number
@@ -174,7 +175,7 @@ func (m Mixer) DecodeNumber(password string, data string) (int64, error) {
 
 //EncodeID encode uint64 ID
 func (m Mixer) EncodeID(password string, id uint64) string {
-	return m.EncodeIDPadding(password, id, DefaultNumberPadding)
+	return m.EncodeIDPadding(password, id, DefaultPaddingLength)
 }
 
 //EncodeIDPadding encode uint64 ID
