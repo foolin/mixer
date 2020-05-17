@@ -1,6 +1,7 @@
 package mixer
 
 import (
+	"encoding/base32"
 	"fmt"
 	"strconv"
 	"sync"
@@ -8,7 +9,8 @@ import (
 
 const (
 	//DefaultSalt salt for random seed: 202002022002
-	DefaultSalt = "202002022002" //2020.02.02 20:02
+	DefaultSalt          = "202002022002" //2020.02.02 20:02
+	DefaultNumberPadding = 16
 )
 
 var (
@@ -50,7 +52,8 @@ var (
 	SymbolsMixer = NewWith(DefaultSalt, "0123456789ABCabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ~!@#$%^&*()_+-=.")
 )
 
-var alphabetsRunes = []rune("abcdefghijklmnopqrstuvwxyz")
+var alphabetsRunes = []rune("ABCDEFGHIJKLMNOPQRSTUVWXYZ")
+var base32NoPadding = base32.StdEncoding.WithPadding(base32.NoPadding)
 
 //Config configuration for new mixer
 type Config struct {
@@ -146,35 +149,89 @@ func (m Mixer) Decode(password string, data []rune) []rune {
 	return outChars
 }
 
-//EncodeNumber encode string
+//EncodeNumber encode int64 number
 func (m Mixer) EncodeNumber(password string, value int64) string {
-	return m.EncodeNumberPadding(password, value, 16)
+	return m.EncodeNumberPadding(password, value, DefaultNumberPadding)
 }
 
-//EncodeNumberPadding encode string
+//EncodeNumberPadding encode int64 number
 func (m Mixer) EncodeNumberPadding(password string, value int64, paddingLen int) string {
-	runes := []rune(strconv.FormatInt(value, 10))
-	numLen := len(runes)
-	if numLen < paddingLen {
-		seed := m.getSeed(password)
-		runes = append(runes, randomAlphabets(paddingLen-numLen, seed)...)
-	}
-	return string(m.Encode(password, runes))
+	return m.EncodeBase32Padding(password, strconv.FormatInt(value, 10), paddingLen)
 }
 
-//DecodeNumber decode string
-func (m Mixer) DecodeNumber(password string, data string) int64 {
+//DecodeNumber decode int64 number
+func (m Mixer) DecodeNumber(password string, data string) (int64, error) {
+	decodeString, err := m.DecodeBase32(password, data)
+	if err != nil {
+		return 0, err
+	}
+	val, err := strconv.ParseInt(decodeString, 10, 64)
+	if err != nil {
+		return 0, err
+	}
+	return val, nil
+}
+
+//EncodeID encode uint64 ID
+func (m Mixer) EncodeID(password string, id uint64) string {
+	return m.EncodeIDPadding(password, id, DefaultNumberPadding)
+}
+
+//EncodeIDPadding encode uint64 ID
+func (m Mixer) EncodeIDPadding(password string, id uint64, paddingLen int) string {
+	return m.EncodeBase32Padding(password, strconv.FormatUint(id, 10), paddingLen)
+}
+
+//DecodeID decode uint64 ID
+func (m Mixer) DecodeID(password string, data string) (uint64, error) {
+	decodeString, err := m.DecodeBase32(password, data)
+	if err != nil {
+		return 0, err
+	}
+	val, err := strconv.ParseUint(decodeString, 10, 64)
+	if err != nil {
+		return 0, err
+	}
+	return val, nil
+}
+
+// DecodeBase32 decode base32 data
+func (m Mixer) DecodeBase32(password string, data string) (string, error) {
 	decodeRunes := m.Decode(password, []rune(data))
-	numRunes := make([]rune, 0)
+	baseRunes := make([]rune, 0)
 	for _, r := range decodeRunes {
-		if r >= '0' && r <= '9' {
-			numRunes = append(numRunes, r)
+		if r != '0' {
+			baseRunes = append(baseRunes, r)
 		} else {
 			break
 		}
 	}
-	val, _ := strconv.ParseInt(string(numRunes), 10, 64)
-	return val
+	value, err := base32NoPadding.DecodeString(string(baseRunes))
+	if err != nil {
+		return "", err
+	}
+	return string(value), nil
+}
+
+// EncodeBase32 encode base32 data
+func (m Mixer) EncodeBase32(password string, value string) string {
+	return m.EncodeBase32Padding(password, value, 0)
+}
+
+// EncodeBase32Padding encode base32 data
+func (m Mixer) EncodeBase32Padding(password string, value string, paddingLen int) string {
+	//base32 chars range: [A-Z] [2-7]
+	runes := []rune(base32NoPadding.EncodeToString([]byte(value)))
+	numLen := len(runes)
+	if paddingLen > 0 && numLen < paddingLen {
+		seed := m.getSeed(password)
+		pdSize := paddingLen - numLen - 1
+		runes = append(runes, '0') //zero to split padding chars
+		if pdSize > 0 {
+			runes = append(runes, randomAlphabets(pdSize, seed)...)
+		}
+	}
+	return string(m.Encode(password, runes))
 }
 
 //EncodeString encode string

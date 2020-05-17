@@ -1,17 +1,16 @@
 package main
 
 import (
-	"crypto/md5"
 	"fmt"
 	"github.com/foolin/mixer"
 )
 
 func main() {
-	//the source to be encrypted
+
 	sources := []string{
-		"abc012345edf",
-		"0123456789abcdefghijklmnopqrstuvwxyz",
-		fmt.Sprintf("%x", md5.Sum([]byte("Hello Mixer"))),
+		"!@#$#$%^&*()",
+		"/foolin/Mixer#Install",
+		"我是Mixer",
 	}
 
 	//password
@@ -19,11 +18,15 @@ func main() {
 
 	//foreach every source
 	for _, source := range sources {
+
 		//Encode source data
-		encodeData := mixer.EncodeString(password, source)
+		encodeData := mixer.EncodeBase32(password, source)
 
 		//Decode source data
-		decodeData := mixer.DecodeString(password, encodeData)
+		decodeData, err := mixer.DecodeBase32(password, encodeData)
+		if err != nil {
+			panic(err)
+		}
 
 		//Output result
 		fmt.Printf("-------\nsource: %v\nencode: %v\ndecode: %v\n-------\n",

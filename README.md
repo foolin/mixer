@@ -33,20 +33,62 @@ The {version} release list: <https://github.com/foolin/mixer/releases>
 
 ```golang
 
+
 //EncodeString encode string use global default mixer
-func EncodeString(password string, data string) string
+func EncodeString(password string, data string) string {
+	return globalStdStringMixer.EncodeString(password, data)
+}
 
 //DecodeString encode global default mixer
-func DecodeString(password string, data string) string
+func DecodeString(password string, data string) string {
+	return globalStdStringMixer.DecodeString(password, data)
+}
 
 //EncodeNumber encode global default mixer
-func EncodeNumber(password string, value int64) string
+func EncodeNumber(password string, value int64) string {
+	return globalStdNumberMixer.EncodeNumber(password, value)
+}
 
 //EncodeNumberPadding  encode padding default number mixer
-func EncodeNumberPadding(password string, value int64, paddingLen int) string
+func EncodeNumberPadding(password string, value int64, paddingLen int) string {
+	return globalStdNumberMixer.EncodeNumberPadding(password, value, paddingLen)
+}
 
 //DecodeNumber decode default number mixer
-func DecodeNumber(password string, data string) int64
+func DecodeNumber(password string, data string) (int64, error) {
+	return globalStdNumberMixer.DecodeNumber(password, data)
+}
+
+//EncodeID encode global default mixer
+func EncodeID(password string, value uint64) string {
+	return globalStdNumberMixer.EncodeID(password, value)
+}
+
+//EncodeIDPadding  encode padding default number mixer
+func EncodeIDPadding(password string, value uint64, paddingLen int) string {
+	return globalStdNumberMixer.EncodeIDPadding(password, value, paddingLen)
+}
+
+//DecodeID decode default number mixer
+func DecodeID(password string, data string) (uint64, error) {
+	return globalStdNumberMixer.DecodeID(password, data)
+}
+
+//EncodeBase32 encode global default mixer
+func EncodeBase32(password string, value string) string {
+	return globalStdNumberMixer.EncodeBase32(password, value)
+}
+
+//EncodeBase32Padding  encode padding default number mixer
+func EncodeBase32Padding(password string, value string, paddingLen int) string {
+	return globalStdNumberMixer.EncodeBase32Padding(password, value, paddingLen)
+}
+
+//DecodeBase32 decode default number mixer
+func DecodeBase32(password string, data string) (string, error) {
+	return globalStdNumberMixer.DecodeBase32(password, data)
+}
+
 
 ```
 
@@ -54,7 +96,7 @@ See [Mixer Godoc](https://pkg.go.dev/github.com/foolin/mixer)
 
 # Usage
 
-- Number(ID) Example:
+- ID Example:
 
 ```golang
 
@@ -63,18 +105,19 @@ package main
 import (
 	"fmt"
 	"github.com/foolin/mixer"
-	"time"
 )
 
 func main() {
 
 	//the source to be encrypted
-	sources := []int64{
+	sources := []uint64{
+		0,
 		123,
 		123456,
 		1234567890,
 		999999999,
-		time.Now().UnixNano(),
+		9223372036854775808,
+		18446744073709551615,
 	}
 
 	//password
@@ -84,16 +127,22 @@ func main() {
 	for _, source := range sources {
 
 		//Encode source data
-		encodeData := mixer.EncodeNumber(password, source)
+		encodeData := mixer.EncodeID(password, source)
 
 		//Decode source data
-		decodeData := mixer.DecodeNumber(password, encodeData)
+		decodeData, err := mixer.DecodeID(password, encodeData)
+		if err != nil {
+			panic(err)
+		}
 
 		//Encode source data with padding 20
-		encodePaddingData := mixer.EncodeNumberPadding(password, source, 20)
+		encodePaddingData := mixer.EncodeIDPadding(password, source, 20)
 
 		//Decode source padding data
-		decodePaddingData := mixer.DecodeNumber(password, encodeData)
+		decodePaddingData, err := mixer.DecodeID(password, encodeData)
+		if err != nil {
+			panic(err)
+		}
 
 		//Output result
 		fmt.Printf("-------\nsource: %v\nencode: %v\ndecode: %v\nencodePadding(20): %v\ndecodePadding(20): %v\n-------\n",
@@ -102,46 +151,60 @@ func main() {
 
 }
 
+
 ```
 
 Run output:
 ```
 -------
+source: 0
+encode: 0BAN5S350WAZ3JQW
+decode: 0
+encodePadding(20): 0BA85SS50WAZ3OQLW3NJ
+decodePadding(20): 0
+-------
+-------
 source: 123
-encode: 0kanys350waz3juw
+encode: S0QWFABN30J5Z0QH
 decode: 123
-encodePadding(20): 0ka8yss50waz3oulw3nj
+encodePadding(20): S0Q3FAAN30J5ZLQWHBW0
 decodePadding(20): 123
 -------
 -------
 source: 123456
-encode: skiwyapn30j5z0u7
+encode: B0Q8FC4OQ3NASWQH
 decode: 123456
-encodePadding(20): ski3yaan30j5zluw7pw0
+encodePadding(20): B0Q0FC5OQ3NASJQ0H48W
 decodePadding(20): 123456
 -------
 -------
 source: 1234567890
-encode: wkidy1pbens30au7
+encode: K0Q8FC4OQSL33ZQH
 decode: 1234567890
-encodePadding(20): wkijy10bens30zu57pda
+encodePadding(20): K0QAFCWOQSL333QBH48Z
 decodePadding(20): 1234567890
 -------
 -------
 source: 999999999
-encode: aeeeeeewes0n53ee
+encode: 77JLF0SFNS9JBZNZ
 decode: 999999999
-encodePadding(20): aeezeejwes0n5we0eee3
+encodePadding(20): 77J3F0AFNS9JBNNWZSLZ
 decodePadding(20): 999999999
 -------
 -------
-source: 1589704043390707700
-encode: k1dbibbk7dbbdeudeb7
-decode: 1589704043390707700
-encodePadding(20): k1dbibbk7dbbdwudeb7e
-decodePadding(20): 1589704043390707700
+source: 9223372036854775808
+encode: 059Y4Z77Q0052GNN5W0HFQWZFHSHM50
+decode: 9223372036854775808
+encodePadding(20): 059Y4Z77Q0052GNN5W0HFQWZFHSHM50
+decodePadding(20): 9223372036854775808
 -------
-
+-------
+source: 18446744073709551615
+encode: YL5KS2O7QL89GCQQW48H9QWZFCWZMW7H
+decode: 18446744073709551615
+encodePadding(20): YL5KS2O7QL89GCQQW48H9QWZFCWZMW7H
+decodePadding(20): 18446744073709551615
+-------
 
 ```
 
@@ -159,7 +222,6 @@ import (
 )
 
 func main() {
-
 	//the source to be encrypted
 	sources := []string{
 		"abc012345edf",

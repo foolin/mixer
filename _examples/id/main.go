@@ -8,14 +8,14 @@ import (
 func main() {
 
 	//the source to be encrypted
-	sources := []int64{
+	sources := []uint64{
 		0,
 		123,
 		123456,
 		1234567890,
 		999999999,
-		9223372036854775807,
-		-9223372036854775808,
+		9223372036854775808,
+		18446744073709551615,
 	}
 
 	//password
@@ -25,19 +25,19 @@ func main() {
 	for _, source := range sources {
 
 		//Encode source data
-		encodeData := mixer.EncodeNumber(password, source)
+		encodeData := mixer.EncodeID(password, source)
 
 		//Decode source data
-		decodeData, err := mixer.DecodeNumber(password, encodeData)
+		decodeData, err := mixer.DecodeID(password, encodeData)
 		if err != nil {
 			panic(err)
 		}
 
 		//Encode source data with padding 20
-		encodePaddingData := mixer.EncodeNumberPadding(password, source, 20)
+		encodePaddingData := mixer.EncodeIDPadding(password, source, 20)
 
 		//Decode source padding data
-		decodePaddingData, err := mixer.DecodeNumber(password, encodeData)
+		decodePaddingData, err := mixer.DecodeID(password, encodeData)
 		if err != nil {
 			panic(err)
 		}

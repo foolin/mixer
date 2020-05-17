@@ -78,12 +78,41 @@ func TestNumber(t *testing.T) {
 		12,
 		123,
 		123456789,
-		time.Now().Unix(),
+		1234567890,
+		-1234567890,
 	}
 	for _, source := range sources {
 		for _, m := range testMixers {
 			encodeData := m.Mixer.EncodeNumber(password, source)
-			decodeData := m.Mixer.DecodeNumber(password, encodeData)
+			decodeData, err := m.Mixer.DecodeNumber(password, encodeData)
+			if err != nil {
+				t.Fatal(err)
+			}
+			if source != decodeData {
+				t.Fatalf("error: decode data not equal\n mixer: %v\nsource: %v\nencode: %v\ndecode: %v",
+					m.Name, source, encodeData, decodeData)
+			}
+			t.Logf("-------\n mixer: %v\nsource: %v\nencode: %v\ndecode: %v", m.Name, source, encodeData, decodeData)
+		}
+	}
+}
+
+func TestID(t *testing.T) {
+	sources := []uint64{
+		1,
+		12,
+		123,
+		123456789,
+		1234567890,
+		uint64(time.Now().Unix()),
+	}
+	for _, source := range sources {
+		for _, m := range testMixers {
+			encodeData := m.Mixer.EncodeID(password, source)
+			decodeData, err := m.Mixer.DecodeID(password, encodeData)
+			if err != nil {
+				t.Fatal(err)
+			}
 			if source != decodeData {
 				t.Fatalf("error: decode data not equal\n mixer: %v\nsource: %v\nencode: %v\ndecode: %v",
 					m.Name, source, encodeData, decodeData)
