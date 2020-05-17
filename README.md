@@ -210,7 +210,7 @@ decode: 51f5df9e0e802ed54465638ba31158c2
 ```
 
 
-# Todos
+# Todo
 
 ###  Other languages Implementations
 
